@@ -24,7 +24,7 @@ export async function GET() {
       return NextResponse.json({ error: "Data Wali tidak ditemukan" }, { status: 404 });
     }
 
-    // 4. HITUNG JUMLAH ANAK yang waliEmail-nya cocok dengan email Wali ini
+    // 4. hitung jumlah anak yang wali Email-nya cocok dengan email Wali ini
     const totalAnak = await prisma.user.count({
       where: {
         role: "SISWA",
