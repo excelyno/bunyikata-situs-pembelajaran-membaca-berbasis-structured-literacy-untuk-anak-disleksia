@@ -12,6 +12,8 @@ model User {
   username  String   @unique
   password  String
   nama      String
-  role      String // "WALI" || "SISWA"
+  role      String // WALI || SISWA
+  email     String?  @unique // Khusus WALI
+  waliEmail String? // Khusus SISWA (Untuk mencari siapa walinya)
   createdAt DateTime @default(now())
 }
