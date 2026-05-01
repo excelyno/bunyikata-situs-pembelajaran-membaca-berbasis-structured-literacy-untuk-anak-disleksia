@@ -1,6 +1,8 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { say } from "@/lib/speak";
+import Image from "next/image";
+import HeroImage from "../../public/hero/gorogu-landing.png"
 
 const ALPHABET = "abcdefghijklmnopqrstuvwxyz".split("");
 

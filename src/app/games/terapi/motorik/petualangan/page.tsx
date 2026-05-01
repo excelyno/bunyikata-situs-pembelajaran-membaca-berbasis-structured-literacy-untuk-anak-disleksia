@@ -1,192 +1,241 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import DrawingCanvas from "@/app/components/DrawingCanvas"; // Pastikan path ini sesuai dengan canvas buatan abang
+import Image from "next/image";
+import HeroImage from "../../../../../../public/hero/gorogu-landing.png";
 
-// --- DATA LEVEL ---
-const LEVELS = [
-  { word: "BUDI", jumbled: ["D", "I", "U", "B"], category: "MOTORIC_WORD_4" },
-  { word: "BOLA", jumbled: ["L", "A", "O", "B"], category: "MOTORIC_WORD_4" },
-  { word: "PINTU", jumbled: ["N", "T", "I", "U", "P"], category: "MOTORIC_WORD_5" },
+// --- DATA LEVEL SESUAI SKENARIO ---
+const LEVEL_1_TASKS = ["b", "d", "p", "q", "9"];
+const LEVEL_2_TASKS = [
+  { target: "b", options: ["b", "d"] },
+  { target: "d", options: ["b", "d"] },
+  { target: "m", options: ["m", "n"] },
+  { target: "n", options: ["n", "m"] },
+  { target: "6", options: ["6", "9"] },
+];
+const LEVEL_3_TASKS = [
+  { type: "write", target: "m" },
+  { type: "drag", target: "b", options: ["d", "p", "b"] }, // 3 Opsi dipersulit
+  { type: "write", target: "8" },
 ];
 
 export default function MotorikBudi() {
   const router = useRouter();
-  const [phase, setPhase] = useState(0); // 0: Intro, 1: Main, 2: Tamat
-  const [levelIdx, setLevelIdx] = useState(0);
   
-  const [targetWord, setTargetWord] = useState<string[]>([]);
-  const [availableLetters, setAvailableLetters] = useState<string[]>([]);
-  const [placedLetters, setPlacedLetters] = useState<(string | null)[]>([]);
+  // STATE MANAGEMENT UTAMA (Menggantikan phase 0,1,2)
+  const [scene, setScene] = useState<
+    "intro" | "lvl1" | "trans1" | "lvl2" | "trans2" | "lvl3" | "outro" | "freedraw" | "done"
+  >("intro");
+  
+  const [taskIndex, setTaskIndex] = useState(0); // Melacak urutan soal di dalam level
   const [draggedLetter, setDraggedLetter] = useState<string | null>(null);
 
-  // --- VARIABEL PENILAIAN (UNIVERSAL SCORING) ---
-  const [sessionStartTime, setSessionStartTime] = useState<number>(0);
-  const [startTimeMs, setStartTimeMs] = useState<number>(0);
-  const [logs, setLogs] = useState<any[]>([]);
-  const [mistakes, setMistakes] = useState(0);
+  // Fungsi Text-to-Speech (Membaca otomatis)
+  const playAudio = (text: string) => {
+    window.speechSynthesis.cancel(); // Hentikan suara sebelumnya jika ada
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "id-ID";
+    speech.rate = 0.9; // Agak lambat agar anak jelas mendengarnya
+    window.speechSynthesis.speak(speech);
+  };
 
+  // Efek Suara Otomatis Setiap Pindah Scene/Task
   useEffect(() => {
-    if (phase === 1) {
-      if (sessionStartTime === 0) setSessionStartTime(Date.now());
-      setupLevel();
+    if (scene === "intro") playAudio("Halo! Budi ingin pergi ke suatu taman. Tetapi dia kesepian dan ingin kamu menemani dia berpetualang. Bantu Budi menyelesaikan soal-soal ini agar Budi dan kamu sampai di taman ya!");
+    if (scene === "lvl1") playAudio(`Ayo tulis huruf ${LEVEL_1_TASKS[taskIndex]} di dalam kotak!`);
+    if (scene === "trans1") playAudio("Hebat sekali! Jalan menuju taman mulai terbuka. Ayo kita lanjutkan petualangan ini!");
+    if (scene === "lvl2") playAudio(`Budi kebingungan nih. Pindahkan huruf ${LEVEL_2_TASKS[taskIndex].target} ke dalam kotak kosong ya!`);
+    if (scene === "trans2") playAudio("Wah, kamu pintar sekali! Tinggal satu bukit lagi menuju taman di Misi Kombinasi.");
+    if (scene === "lvl3") {
+        const task = LEVEL_3_TASKS[taskIndex];
+        if (task.type === "write") playAudio(`Tulis huruf ${task.target} ikuti garisnya!`);
+        else playAudio(`Pilih dan pindahkan huruf ${task.target} dari tiga pilihan ini!`);
     }
-  }, [phase, levelIdx]);
+    if (scene === "outro") playAudio("Yeay! Budi sudah sampai di taman! Terima kasih sudah menemani Budi berpetualang. Sebagai penutup, tulis huruf favoritmu di sini ya!");
+  }, [scene, taskIndex]);
 
-  const setupLevel = () => {
-    const lvl = LEVELS[levelIdx];
-    setTargetWord(lvl.word.split(""));
-    setAvailableLetters([...lvl.jumbled]);
-    setPlacedLetters(Array(lvl.word.length).fill(null));
-    setStartTimeMs(Date.now()); // Mulai timer untuk penempatan huruf pertama
+  // --- LOGIC GAMEPLAY ---
+  const handleNextTask_Lvl1 = (score: number) => {
+    // Bisa simpan score ke state logs jika perlu
+    if (taskIndex < LEVEL_1_TASKS.length - 1) setTaskIndex((p) => p + 1);
+    else { setTaskIndex(0); setScene("trans1"); }
   };
 
-  // Fungsi untuk Drag & Drop
-  const handleDragStart = (letter: string) => {
-    setDraggedLetter(letter);
-  };
-
-  const handleDrop = (index: number) => {
-    if (!draggedLetter) return;
-
-    const expectedLetter = targetWord[index];
-    const responseTimeMs = Date.now() - startTimeMs;
-    const isCorrect = draggedLetter === expectedLetter;
-
-    // Rekam Log Analitik
-    const newLog = {
-      targetItem: expectedLetter,
-      answeredItem: draggedLetter,
-      isCorrect: isCorrect,
-      responseTimeMs: responseTimeMs,
-      errorCategory: LEVELS[levelIdx].category,
-    };
-    setLogs((prev) => [...prev, newLog]);
-
-    if (isCorrect) {
-      // Masukkan huruf ke kotak
-      const newPlaced = [...placedLetters];
-      newPlaced[index] = draggedLetter;
-      setPlacedLetters(newPlaced);
-
-      // Hapus huruf dari daftar pilihan
-      setAvailableLetters((prev) => {
-        const idx = prev.indexOf(draggedLetter);
-        if (idx !== -1) {
-          const newArr = [...prev];
-          newArr.splice(idx, 1);
-          return newArr;
-        }
-        return prev;
-      });
-
+  const handleDrop_Lvl2 = (targetObj: any) => {
+    if (draggedLetter === targetObj.target) {
       setDraggedLetter(null);
-      setStartTimeMs(Date.now()); // Reset timer untuk huruf berikutnya
-
-      // Cek apakah level selesai (semua kotak terisi)
-      if (!newPlaced.includes(null)) {
-        setTimeout(() => {
-          if (levelIdx < LEVELS.length - 1) {
-            setLevelIdx(levelIdx + 1);
-          } else {
-            finishGame();
-          }
-        }, 1000);
-      }
+      if (taskIndex < LEVEL_2_TASKS.length - 1) setTaskIndex((p) => p + 1);
+      else { setTaskIndex(0); setScene("trans2"); }
     } else {
-      // Salah Taruh
-      setMistakes((prev) => prev + 1);
-      alert("Wah, sepertinya huruf itu bukan untuk kotak yang ini. Coba lagi! 🧱");
+      playAudio("O-ow, sepertinya itu huruf yang berbeda. Coba lihat lagi!");
       setDraggedLetter(null);
     }
   };
 
-  const finishGame = async () => {
-    setPhase(2);
-    
-    const durationSec = Math.floor((Date.now() - sessionStartTime) / 1000);
-    // Logika Skor: Setiap salah mengurangi 5 poin
-    const score = Math.max(10, 100 - (mistakes * 5)); 
-    
-    const studentId = "ID_SISWA_DUMMY"; // TODO: Integrasi dengan ID User yang login
-
-    try {
-      await fetch("/api/games/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          studentId: studentId,
-          sessionType: "TERAPI_MOTORIK_BUDI",
-          durationSec: durationSec,
-          score: score,
-          logs: logs,
-        }),
-      });
-      console.log("Data Motorik berhasil dikirim!");
-    } catch (error) {
-      console.error("Gagal mengirim data:", error);
-    }
+  const handleNextTask_Lvl3 = () => {
+    setDraggedLetter(null);
+    if (taskIndex < LEVEL_3_TASKS.length - 1) setTaskIndex((p) => p + 1);
+    else { setTaskIndex(0); setScene("outro"); }
   };
+
+
+  // --- KOMPONEN RENDERER ---
+
+  // 1. Template Scene Cerita (Visual Novel Mode)
+  const VNStoryScreen = ({ text, onNext, bgClass, bgImage }: { text: string, onNext: () => void, bgClass?: string, bgImage?: string }) => (
+    <div 
+      className={`w-full h-screen ${bgClass || ""} bg-cover bg-center flex flex-col justify-end relative overflow-hidden`}
+      style={bgImage ? { backgroundImage: `url(${bgImage})` } : undefined}
+    >
+      {/* Sprite Budi (Gambar transparan tanpa background) */}
+      <img src={HeroImage.src} width={500} height={500} alt="Budi" className="absolute bottom-20 left-10 w-64 md:w-80" />
+      
+      {/* Kotak Dialog Khas Visual Novel */}
+      <div className="bg-white/75 backdrop-blur-md border-t-8 border-orange-500 p-6 md:p-8 w-full min-h-[20vh] shadow-[0_-10px_30px_rgba(0,0,0,0.1)] z-10 flex flex-col justify-between">
+        <p className="text-xl md:text-2xl text-gray-900 font-bold leading-relaxed max-w-4xl">{text}</p>
+        <div className="flex justify-end mt-4">
+          <button onClick={onNext} className="bg-green-600 text-white px-8 py-3 rounded-full font-black text-lg shadow-[0_6px_0_#166534] active:translate-y-2 active:shadow-none hover:bg-green-700 transition-all flex items-center gap-2">
+            Lanjut Petualangan <span>→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-orange-50 p-6 flex flex-col items-center justify-center relative">
-      <button onClick={() => router.push("/games/terapi/motorik")} className="absolute top-6 left-6 w-12 h-12 bg-white text-orange-500 rounded-full flex items-center justify-center font-black text-xl shadow-md hover:scale-110 transition-all z-10">{"<"}</button>
+    <div className="min-h-screen bg-orange-50 font-sans flex flex-col items-center justify-center relative">
+      {/* Tombol Keluar Global */}
+      <button onClick={() => router.push("/games/terapi/motorik")} className="absolute top-6 left-6 w-12 h-12 bg-white text-orange-500 rounded-full flex items-center justify-center font-black text-xl shadow-md hover:scale-110 z-50">{"<"}</button>
 
-      {phase === 0 && (
-        <div className="bg-white p-10 rounded-[40px] shadow-2xl text-center max-w-lg">
-          <div className="text-8xl mb-6 animate-bounce">🧱</div>
-          <h1 className="text-3xl font-black text-orange-600 mb-4">Pembangun Kata</h1>
-          <p className="text-gray-600 mb-8 font-medium">Bantu Budi menyusun balok-balok huruf ini menjadi sebuah kata yang benar!</p>
-          <button onClick={() => setPhase(1)} className="w-full bg-orange-500 text-white py-4 rounded-3xl font-black text-xl shadow-[0_8px_0_#c2410c] active:translate-y-2 active:shadow-none transition-all">Mulai Membangun 🏗️</button>
+      {/* --- SCENE 1: INTRO STORY --- */}
+      {scene === "intro" && (
+        <VNStoryScreen 
+          bgImage="/bg/pemandangan-background.png"
+          text="Budi ingin pergi ke suatu taman. Tetapi dia kesepian dan ingin kamu menemani dia berpetualang. Bantu Budi menyelesaikan soal-soal ini agar Budi dan kamu sampai di taman!"
+          onNext={() => setScene("lvl1")}
+        />
+      )}
+
+      {/* --- SCENE 2: LEVEL 1 (MENULIS HURUF) --- */}
+      {scene === "lvl1" && (
+        <div className="w-full max-w-2xl text-center px-4 animate-in slide-in-from-right duration-500">
+          <div className="bg-orange-200 text-orange-800 px-6 py-2 rounded-full font-bold inline-block mb-6 uppercase tracking-wider">Level 1: Menulis (Soal {taskIndex + 1} dari 5)</div>
+          <DrawingCanvas watermark={LEVEL_1_TASKS[taskIndex]} onComplete={handleNextTask_Lvl1} />
         </div>
       )}
 
-      {phase === 1 && (
-        <div className="w-full max-w-3xl flex flex-col items-center">
-          <div className="bg-orange-200 text-orange-800 px-4 py-1 rounded-full text-sm font-bold inline-block mb-8 uppercase tracking-wider">
-            Level {levelIdx + 1}
+      {/* --- SCENE 3: TRANSISI 1 --- */}
+      {scene === "trans1" && (
+        <VNStoryScreen 
+          bgImage="/bg/pemandangan-background.png"
+          text="Budi bilang: 'Wah, tulisanmu rapi sekali! Peta ini mulai menunjukkan jalan, ayo lanjut masuk ke hutan!'"
+          onNext={() => setScene("lvl2")}
+        />
+      )}
+
+      {/* --- SCENE 4: LEVEL 2 (DRAG & DROP 2 OPSI) --- */}
+      {scene === "lvl2" && (
+        <div className="w-full max-w-2xl text-center px-4 animate-in slide-in-from-right duration-500">
+          <div className="bg-green-200 text-green-800 px-6 py-2 rounded-full font-bold inline-block mb-6 uppercase tracking-wider">Level 2: Pindahkan Huruf (Soal {taskIndex + 1} dari 5)</div>
+          
+          <p className="text-2xl font-black text-gray-700 mb-8">Pindahkan huruf yang benar ke kotak di atas!</p>
+          
+          {/* Kotak Target */}
+          <div className="flex justify-center mb-12">
+            <div 
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={() => handleDrop_Lvl2(LEVEL_2_TASKS[taskIndex])}
+              className="w-40 h-48 border-8 border-dashed border-gray-300 rounded-3xl flex items-center justify-center text-9xl font-black text-gray-200"
+            >
+              {LEVEL_2_TASKS[taskIndex].target} {/* Sebagai Watermark bayangan */}
+            </div>
           </div>
 
-          {/* KOTAK TARGET DROP */}
-          <div className="flex gap-4 mb-16">
-            {placedLetters.map((letter, idx) => (
-              <div 
-                key={idx} 
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={() => handleDrop(idx)}
-                className={`w-20 h-24 sm:w-24 sm:h-28 rounded-2xl border-4 border-dashed flex items-center justify-center text-5xl font-black transition-all ${
-                  letter ? "bg-orange-500 border-orange-600 text-white scale-110 shadow-lg" : "border-orange-300 bg-orange-100 text-transparent"
-                }`}
-              >
-                {letter || targetWord[idx]}
-              </div>
-            ))}
-          </div>
-
-          {/* BALOK HURUF YG BISA DI-DRAG */}
-          <p className="text-orange-800 font-bold mb-4">Tarik balok di bawah ini ke kotak yang tepat:</p>
-          <div className="flex flex-wrap justify-center gap-4">
-            {availableLetters.map((letter, idx) => (
+          {/* Opsi Drag */}
+          <div className="flex justify-center gap-8">
+            {LEVEL_2_TASKS[taskIndex].options.map((opt, idx) => (
               <div
                 key={idx}
                 draggable
-                onDragStart={() => handleDragStart(letter)}
-                className="w-20 h-24 sm:w-24 sm:h-28 bg-white border-b-8 border-orange-200 rounded-2xl flex items-center justify-center text-5xl font-black text-orange-600 cursor-grab active:cursor-grabbing hover:-translate-y-2 transition-transform shadow-sm"
+                onDragStart={() => setDraggedLetter(opt)}
+                className="w-32 h-40 bg-white border-b-8 border-green-600 rounded-3xl flex items-center justify-center text-7xl font-black text-gray-700 cursor-grab active:cursor-grabbing hover:-translate-y-2 transition-transform shadow-lg"
               >
-                {letter}
+                {opt}
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {phase === 2 && (
-        <div className="bg-white p-10 rounded-[40px] shadow-2xl text-center max-w-lg">
-          <div className="text-8xl mb-6">🏆</div>
-          <h1 className="text-4xl font-black text-orange-600 mb-2">Arsitek Hebat!</h1>
-          <p className="text-gray-600 mb-8 font-medium text-lg">Semua kata berhasil disusun. Data permainanmu telah disimpan dengan aman.</p>
-          <button onClick={() => router.push("/dashboard/siswa")} className="w-full bg-orange-500 text-white py-4 rounded-3xl font-black text-xl shadow-[0_8px_0_#c2410c] active:translate-y-2 active:shadow-none transition-all">Selesai Berpetualang</button>
+      {/* --- SCENE 5: TRANSISI 2 --- */}
+      {scene === "trans2" && (
+        <VNStoryScreen 
+          bgImage="/bg/pemandangan-background.png"
+          text="Budi berseru, 'Jalannya hampir sampai! Kita hanya perlu melewati rintangan kombinasi di bukit ini!'"
+          onNext={() => setScene("lvl3")}
+        />
+      )}
+
+      {/* --- SCENE 6: LEVEL 3 (KOMBINASI) --- */}
+      {scene === "lvl3" && (
+        <div className="w-full max-w-2xl text-center px-4 animate-in slide-in-from-right duration-500">
+          <div className="bg-purple-200 text-purple-800 px-6 py-2 rounded-full font-bold inline-block mb-6 uppercase tracking-wider">Level 3: Kombinasi (Soal {taskIndex + 1} dari 3)</div>
+          
+          {LEVEL_3_TASKS[taskIndex].type === "write" ? (
+             <DrawingCanvas watermark={LEVEL_3_TASKS[taskIndex].target} onComplete={handleNextTask_Lvl3} />
+          ) : (
+            <>
+              <p className="text-2xl font-black text-gray-700 mb-8">Pindahkan huruf yang benar ke kotak di atas!</p>
+              <div className="flex justify-center mb-12">
+                <div 
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={() => {
+                    if (draggedLetter === LEVEL_3_TASKS[taskIndex].target) handleNextTask_Lvl3();
+                    else { playAudio("Bukan yang itu, ayo cari lagi!"); setDraggedLetter(null); }
+                  }}
+                  className="w-40 h-48 border-8 border-dashed border-gray-300 rounded-3xl flex items-center justify-center text-9xl font-black text-gray-200"
+                >
+                  {LEVEL_3_TASKS[taskIndex].target}
+                </div>
+              </div>
+              <div className="flex justify-center gap-6">
+                {LEVEL_3_TASKS[taskIndex].options?.map((opt, idx) => (
+                  <div key={idx} draggable onDragStart={() => setDraggedLetter(opt)} className="w-24 h-32 bg-white border-b-8 border-purple-600 rounded-2xl flex items-center justify-center text-6xl font-black text-gray-700 cursor-grab hover:-translate-y-2 shadow-md">{opt}</div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
+
+      {/* --- SCENE 7: OUTRO (TAMAN) --- */}
+      {scene === "outro" && (
+        <VNStoryScreen 
+          bgImage="/bg/pemandangan-background.png"
+          text="Yeay! Budi sudah sampai di taman! Budi dan kelinci sangat senang. Terima kasih sudah menemani Budi berpetualang!"
+          onNext={() => setScene("freedraw")}
+        />
+      )}
+
+      {/* --- SCENE 8: FREE DRAW PENUTUP --- */}
+      {scene === "freedraw" && (
+        <div className="w-full max-w-2xl text-center px-4">
+          <h1 className="text-4xl font-black text-green-700 mb-4">Tulis Huruf Favoritmu!</h1>
+          <p className="text-gray-600 mb-8 font-medium">Sebagai kenang-kenangan, tulis huruf kesukaanmu di kanvas ini.</p>
+          <DrawingCanvas watermark="" onComplete={() => setScene("done")} />
+        </div>
+      )}
+
+      {/* --- SCENE 9: SELESAI --- */}
+      {scene === "done" && (
+        <div className="bg-white p-12 rounded-[40px] shadow-2xl text-center max-w-lg animate-in zoom-in">
+          <div className="text-8xl mb-6 animate-bounce">🌟</div>
+          <h1 className="text-4xl font-black text-orange-600 mb-2">Petualangan Selesai!</h1>
+          <button onClick={() => router.push("/games")} className="mt-8 w-full bg-orange-500 text-white py-4 rounded-3xl font-black text-xl shadow-[0_8px_0_#c2410c] hover:bg-orange-600 transition-all">Kembali ke Beranda</button>
+        </div>
+      )}
+
     </div>
   );
 }
