@@ -3,15 +3,88 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "sqlite" // Kita pakai SQLite dulu biar gampang, nanti gampang diganti ke PostgreSQL kalau mau rilis
   url      = env("DATABASE_URL")
 }
 
+// ==========================================
+// TABEL 1: PENGGUNA (WALI & SISWA)
+// ==========================================
 model User {
   id        String   @id @default(cuid())
   username  String   @unique
   password  String
   nama      String
-  role      String // "WALI" || "SISWA"
+  role      String // Isinya: "WALI" atau "SISWA"
+  email     String?  @unique
+  waliEmail String?
+  createdAt DateTime @default(now())
+
+  // Relasi (Satu siswa punya satu statistik, dan banyak riwayat main)
+  stat         StudentStat?
+  gameSessions GameSession[]
+}
+
+// ==========================================
+// TABEL 2: STATISTIK GAMIFIKASI ANAK
+// ==========================================
+model StudentStat {
+  id String @id @default(cuid())
+
+  // Relasi ke tabel User
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Data Gamifikasi
+  xp     Int    @default(0)
+  level  Int    @default(1)
+  coins  Int    @default(0)
+  avatar String @default("TELUR_KATAK")
+
+  updatedAt DateTime @updatedAt
+}
+
+// ==========================================
+// TABEL 3: SESI BERMAIN (PRATEST / GAME)
+// ==========================================
+model GameSession {
+  id String @id @default(cuid())
+
+  // Relasi ke siswa yang main
+  studentId String
+  student   User   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  // Detail Sesi
+  sessionType String // Isinya: "PRATEST", "GAME_LOMPAT", dll
+  status      String @default("IN_PROGRESS") // Isinya: "IN_PROGRESS" atau "COMPLETED"
+  durationSec Int    @default(0)
+  score       Int    @default(0)
+
+  createdAt DateTime  @default(now())
+  endedAt   DateTime?
+
+  // Relasi ke log jawaban (1 Sesi punya banyak klik/jawaban)
+  logs AnswerLog[]
+}
+
+// ==========================================
+// TABEL 4: MESIN LOG UNIVERSAL (ANALITIK)
+// ==========================================
+model AnswerLog {
+  id String @id @default(cuid())
+
+  // Relasi ke Sesi Bermain
+  sessionId String
+  session   GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  // Detail Interaksi
+  targetItem     String
+  answeredItem   String
+  isCorrect      Boolean
+  responseTimeMs Int
+
+  // Kategori Penyakit/Kesalahan
+  errorCategory String?
+
   createdAt DateTime @default(now())
 }
