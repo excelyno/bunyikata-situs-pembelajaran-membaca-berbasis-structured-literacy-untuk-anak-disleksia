@@ -2,132 +2,258 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-const LEVELS = [
-  { target: "d", noise: "b", count: 12, title: "Mencari Si 'd'", category: "REVERSAL_BD" },
-  { target: "m", noise: "n", count: 15, title: "Pesta Huruf 'n'", category: "VISUAL_SIMILARITY" },
-  { target: "6", noise: "9", count: 20, title: "Angka Terbalik", category: "REVERSAL_NUMBER" },
-  { target: "p", noise: "q", count: 24, title: "Hutan Huruf 'q'", category: "REVERSAL_PQ" }
+// --- DATA LEVEL ---
+const LEVEL_1_DATA = [
+  { target: "SAPU", options: ["SAPI", "SAPU", "PALU"], category: "FLASH_MEMORI" },
+  { target: "BUKU", options: ["BUKA", "KUKU", "BUKU"], category: "FLASH_MEMORI" },
+  { target: "TOPI", options: ["KOPI", "TAPI", "TOPI"], category: "FLASH_MEMORI" },
+  { target: "BOLA", options: ["BOLA", "BOLO", "BALA"], category: "FLASH_MEMORI" },
+  { target: "MEJA", options: ["MEJA", "EJAAN", "MANA"], category: "FLASH_MEMORI" },
+];
+
+const LEVEL_2_DATA = [
+  { image: "🐘", target: "GAJAH", options: ["GAJAH", "GAGAK", "GALAH"], category: "SILUET_KATA" },
+  { image: "🚗", target: "MOBIL", options: ["MOBIL", "BOTOL", "MODEL"], category: "SILUET_KATA" },
+  { image: "🪑", target: "KURSI", options: ["KASUR", "KURSI", "KUNCI"], category: "SILUET_KATA" },
+  { image: "🚪", target: "PINTU", options: ["PINTU", "PIATU", "PINTA"], category: "SILUET_KATA" },
+  { image: "🍎", target: "APEL", options: ["ASAL", "APEL", "AWAL"], category: "SILUET_KATA" },
+];
+
+const LEVEL_3_DATA = [
+  { target: "SEPATU", options: ["SEPAUT", "SEPATU", "SPEATU"], category: "SPOT_ERROR" },
+  { target: "KELAPA", options: ["KEPALA", "KALAPE", "KELAPA"], category: "SPOT_ERROR" },
+  { target: "LEMARI", options: ["LAMERI", "LEMARI", "RELAMI"], category: "SPOT_ERROR" },
+  { target: "KUCING", options: ["KUNING", "KUICNG", "KUCING"], category: "SPOT_ERROR" },
+  { target: "PISANG", options: ["PISNAG", "PISANG", "PASING"], category: "SPOT_ERROR" },
 ];
 
 export default function DetektifKiki() {
   const router = useRouter();
-  const [levelIdx, setLevelIdx] = useState(0);
-  const [gridItems, setGridItems] = useState<string[]>([]);
-  const [phase, setPhase] = useState(0); 
-
-  // --- VARIABEL PENILAIAN ---
+  
+  // --- STATE MANAGEMENT ---
+  const [phase, setPhase] = useState(0); // 0:Intro, 1:Lvl1, 2:Lvl2, 3:Lvl3, 4:Outro
+  const [subPhase, setSubPhase] = useState(0); // Soal ke 0-4
+  const [showFlash, setShowFlash] = useState(false);
+  
+  // --- PENILAIAN & LOGGING ---
   const [startTimeMs, setStartTimeMs] = useState<number>(0);
   const [sessionStartTime, setSessionStartTime] = useState<number>(0);
   const [logs, setLogs] = useState<any[]>([]);
   const [mistakes, setMistakes] = useState(0);
 
+  // --- LOGIKA LEVEL 1 (Flash Word Timer) ---
   useEffect(() => {
     if (phase === 1) {
-      generateGrid();
-      if (sessionStartTime === 0) setSessionStartTime(Date.now()); // Mulai timer global
+      setShowFlash(true);
+      setStartTimeMs(Date.now());
+      if (sessionStartTime === 0) setSessionStartTime(Date.now());
+      
+      const timer = setTimeout(() => setShowFlash(false), 3000);
+      return () => clearTimeout(timer);
     }
-  }, [levelIdx, phase]);
+    if (phase > 1) {
+      setStartTimeMs(Date.now());
+    }
+  }, [phase, subPhase]);
 
-  const generateGrid = () => {
-    const level = LEVELS[levelIdx];
-    const items = Array(level.count).fill(level.noise);
-    const randomIndex = Math.floor(Math.random() * level.count);
-    items[randomIndex] = level.target; 
-    setGridItems(items);
+  // --- HELPER BENTUK SILUET KATA ---
+  const renderSilhouette = (word: string) => {
+    const ascenders = ["b", "d", "f", "h", "k", "l", "t", "B", "D", "F", "H", "K", "L", "T"];
+    const descenders = ["g", "j", "p", "q", "y", "G", "J", "P", "Q", "Y"];
     
-    // Mulai timer (ms) untuk level ini
-    setStartTimeMs(Date.now());
+    return (
+      <div className="flex gap-1 justify-center items-end bg-gray-900/30 p-4 rounded-3xl border-4 border-dashed border-emerald-400/50 min-h-[120px] w-full max-w-sm mx-auto">
+        {word.split("").map((char, idx) => {
+          if (ascenders.includes(char)) {
+            return <div key={idx} className="w-10 h-20 bg-emerald-400/80 rounded-t-xl" />;
+          } else if (descenders.includes(char)) {
+            return <div key={idx} className="w-10 h-20 bg-emerald-400/80 rounded-b-xl -mb-6" />;
+          } else {
+            return <div key={idx} className="w-10 h-14 bg-emerald-400/80 rounded-md" />;
+          }
+        })}
+      </div>
+    );
   };
 
-  const handlePick = (item: string) => {
-    const level = LEVELS[levelIdx];
-    const responseTimeMs = Date.now() - startTimeMs; // Hitung kecepatan klik dalam ms
-    const isCorrect = item === level.target;
+  // --- HANDLE JAWABAN ---
+  const handlePick = (selectedItem: string, targetItem: string, category: string) => {
+    const responseTimeMs = Date.now() - startTimeMs;
+    const isCorrect = selectedItem === targetItem;
 
-    // Rekam log jawaban anak
-    const newLog = {
-      targetItem: level.target,
-      answeredItem: item,
-      isCorrect: isCorrect,
-      responseTimeMs: responseTimeMs,
-      errorCategory: level.category,
-    };
-    setLogs((prev) => [...prev, newLog]);
+    setLogs((prev) => [...prev, { targetItem, answeredItem: selectedItem, isCorrect, responseTimeMs, errorCategory: category }]);
 
     if (isCorrect) {
-      if (levelIdx < LEVELS.length - 1) {
-        setLevelIdx(levelIdx + 1);
+      if (subPhase < 4) {
+        setSubPhase((prev) => prev + 1);
       } else {
-        finishGame();
+        setPhase((prev) => prev + 1); // Pindah Level
+        setSubPhase(0);
       }
     } else {
       setMistakes((prev) => prev + 1);
-      alert("Wah, hampir tepat! Coba lihat lebih teliti lagi 🧐");
+      alert("Wah, belum tepat! Kiki yakin kamu bisa, coba teliti lagi ya! 🧐");
     }
   };
 
   const finishGame = async () => {
-    setPhase(2); // Tampilkan layar menang
-    
     const durationSec = Math.floor((Date.now() - sessionStartTime) / 1000);
-    // Logika Skor: Max 100, dikurangi 5 untuk setiap kesalahan
     const score = Math.max(10, 100 - (mistakes * 5)); 
-
-    // Ambil studentId dari localStorage atau Session (Misal kita simpan di localStorage saat login)
-    // Untuk contoh ini, pastikan abang punya sistem untuk mengambil ID user aktif.
-    const studentId = "ID_SISWA_DUMMY"; // Ganti dengan ID user yang login (bisa dari Context/Zustand)
 
     try {
       await fetch("/api/games/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          studentId: studentId,
           sessionType: "TERAPI_VISUAL_KIKI",
           durationSec: durationSec,
           score: score,
           logs: logs,
         }),
       });
-      console.log("Data berhasil dikirim ke database!");
+      console.log("Data selesai diproses!", { score, durationSec, mistakes, logs });
+      router.push("/dashboard/siswa");
     } catch (error) {
-      console.error("Gagal mengirim data:", error);
+      console.error(error);
     }
   };
 
   return (
-    <div className="min-h-screen bg-emerald-900 p-6 flex flex-col items-center justify-center relative">
-      <button onClick={() => router.push("/games/terapi/visual")} className="absolute top-6 left-6 w-12 h-12 bg-white/10 text-white rounded-full flex items-center justify-center font-black text-xl backdrop-blur-md z-10">{"<"}</button>
+    <div className="min-h-screen bg-[#0F3D3E] text-white p-6 flex flex-col items-center justify-center relative font-sans overflow-hidden">
+      
+      {/* Efek Bintang Hutan */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-emerald-200 via-[#0F3D3E] to-[#0F3D3E]" />
 
+      <button onClick={() => router.push("/games/terapi/visual")} className="absolute top-6 left-6 w-14 h-14 bg-white/10 text-white rounded-full flex items-center justify-center font-black text-2xl backdrop-blur-md z-20 hover:bg-white/20 transition-all">{"<"}</button>
+
+      {/* --- INTRO --- */}
       {phase === 0 && (
-        <div className="bg-white p-10 rounded-[40px] shadow-2xl text-center max-w-lg">
-          <div className="text-8xl mb-6">🦉🔍</div>
-          <h1 className="text-3xl font-black text-emerald-600 mb-4">Detektif Kiki</h1>
-          <button onClick={() => setPhase(1)} className="w-full bg-emerald-600 text-white py-4 rounded-3xl font-black text-xl">Mulai Mencari!</button>
+        <div className="bg-[#1C5D5E] p-10 rounded-[40px] shadow-2xl text-center max-w-xl z-10 border-4 border-emerald-500/30 relative">
+          <div className="text-8xl mb-6 animate-bounce">🦉✨</div>
+          <h1 className="text-4xl font-black text-emerald-300 mb-6 tracking-wide">Petualangan Detektif Kiki</h1>
+          <p className="text-emerald-100 text-lg leading-relaxed mb-8 font-medium">
+            Kiki si Burung Hantu menjatuhkan kacamata ajaibnya dan kesulitan melihat. 
+            Ia butuh bantuanmu sebagai Detektif Kata untuk menemukan barang-barangnya yang hilang di hutan kegelapan!
+          </p>
+          <button onClick={() => setPhase(1)} className="w-full bg-emerald-500 hover:bg-emerald-400 text-white py-4 rounded-3xl font-black text-xl shadow-[0_6px_0_#059669] active:translate-y-2 active:shadow-none transition-all">
+            Mulai Penyelidikan 🔍
+          </button>
         </div>
       )}
 
+      {/* --- LEVEL 1 : FLASH WORD --- */}
       {phase === 1 && (
-        <div className="w-full max-w-2xl flex flex-col items-center">
-          <div className="text-center mb-8">
-            <h2 className="text-white text-3xl font-black mb-2">{LEVELS[levelIdx].title}</h2>
+        <div className="w-full max-w-2xl flex flex-col items-center z-10">
+          <div className="bg-[#1C5D5E]/80 px-6 py-2 rounded-full text-emerald-300 font-bold mb-6 tracking-widest">
+            LEVEL 1: MEMORI VISUAL ({subPhase + 1}/5)
           </div>
-          <div className="bg-white p-6 rounded-[40px] grid grid-cols-4 sm:grid-cols-6 gap-4 w-full">
-            {gridItems.map((item, idx) => (
-              <button key={idx} onClick={() => handlePick(item)} className="aspect-square bg-emerald-50 rounded-2xl flex items-center justify-center text-4xl font-black text-emerald-700 hover:bg-emerald-200">
-                {item}
+
+          <div className="bg-white p-12 rounded-[40px] shadow-2xl text-center w-full min-h-[400px] flex flex-col justify-center border-b-8 border-emerald-200">
+            {showFlash ? (
+              <div className="animate-pulse">
+                <p className="text-emerald-600 font-bold mb-4 uppercase tracking-widest">Ingat kata ini baik-baik!</p>
+                <h2 className="text-8xl font-black text-[#0F3D3E] tracking-widest drop-shadow-md">
+                  {LEVEL_1_DATA[subPhase].target}
+                </h2>
+              </div>
+            ) : (
+              <div className="animate-in fade-in zoom-in duration-300">
+                <p className="text-gray-500 font-black text-2xl mb-8">Kata apa yang barusan kamu lihat?</p>
+                <div className="grid grid-cols-1 gap-4">
+                  {LEVEL_1_DATA[subPhase].options.map((opt, idx) => (
+                    <button 
+                      key={idx} 
+                      onClick={() => handlePick(opt, LEVEL_1_DATA[subPhase].target, LEVEL_1_DATA[subPhase].category)}
+                      className="bg-emerald-50 text-emerald-800 text-3xl font-black py-5 rounded-3xl hover:bg-emerald-500 hover:text-white border-b-4 border-emerald-200 hover:border-emerald-700 transition-all"
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* --- LEVEL 2 : BENTUK KATA (SILUET) --- */}
+      {phase === 2 && (
+        <div className="w-full max-w-2xl flex flex-col items-center z-10 animate-in fade-in zoom-in duration-500">
+          <div className="bg-[#1C5D5E]/80 px-6 py-2 rounded-full text-emerald-300 font-bold mb-6 tracking-widest">
+            LEVEL 2: SILUET KATA ({subPhase + 1}/5)
+          </div>
+
+          <div className="bg-[#1C5D5E] p-8 rounded-[40px] shadow-2xl text-center w-full border-4 border-emerald-500/30">
+            <div className="text-[100px] drop-shadow-xl mb-4 bg-white/10 rounded-3xl inline-block px-8 py-4">
+              {LEVEL_2_DATA[subPhase].image}
+            </div>
+            
+            <p className="text-emerald-200 font-bold mb-4">Pilih kata yang bentuknya pas dengan kotak di bawah ini:</p>
+            
+            {/* Visualisasi Siluet Box */}
+            <div className="mb-10">
+              {renderSilhouette(LEVEL_2_DATA[subPhase].target)}
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-4">
+              {LEVEL_2_DATA[subPhase].options.map((opt, idx) => (
+                <button 
+                  key={idx} 
+                  onClick={() => handlePick(opt, LEVEL_2_DATA[subPhase].target, LEVEL_2_DATA[subPhase].category)}
+                  className="bg-emerald-500 text-white text-2xl font-black py-4 px-8 rounded-2xl shadow-[0_6px_0_#059669] active:translate-y-2 active:shadow-none transition-all tracking-widest"
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- LEVEL 3 : SPOT THE ERROR --- */}
+      {phase === 3 && (
+        <div className="w-full max-w-3xl flex flex-col items-center z-10 animate-in slide-in-from-bottom-10 duration-500">
+          <div className="bg-[#1C5D5E]/80 px-6 py-2 rounded-full text-emerald-300 font-bold mb-6 tracking-widest">
+            LEVEL 3: MENCARI PENIPU ({subPhase + 1}/5)
+          </div>
+
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-black text-emerald-300 mb-2">Hati-hati Rubah Penipu! 🦊</h2>
+            <p className="text-emerald-100 text-lg">Pilih papan petunjuk dengan tulisan yang BENAR.</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 w-full max-w-md">
+            {LEVEL_3_DATA[subPhase].options.map((opt, idx) => (
+              <button 
+                key={idx} 
+                onClick={() => handlePick(opt, LEVEL_3_DATA[subPhase].target, LEVEL_3_DATA[subPhase].category)}
+                className="relative bg-[#D4A373] text-[#5C3D2E] text-4xl font-black py-6 rounded-xl border-b-8 border-[#A67B5B] hover:bg-[#E6B88A] hover:-translate-y-1 active:translate-y-2 active:border-b-0 transition-all tracking-widest shadow-xl flex items-center justify-center"
+              >
+                {/* Efek Baut Papan Kayu */}
+                <div className="absolute left-4 w-3 h-3 bg-[#8C5A3C] rounded-full shadow-inner" />
+                <div className="absolute right-4 w-3 h-3 bg-[#8C5A3C] rounded-full shadow-inner" />
+                {opt}
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {phase === 2 && (
-        <div className="bg-white p-10 rounded-[40px] shadow-2xl text-center max-w-lg">
-          <div className="text-8xl mb-6">🦉💎</div>
-          <h1 className="text-4xl font-black text-emerald-600 mb-2">Hebat!</h1>
-          <p className="text-gray-600 mb-4">Data permainanmu sedang diproses...</p>
-          <button onClick={() => router.push("/dashboard/siswa")} className="w-full bg-emerald-600 text-white py-4 rounded-3xl font-black text-xl">Selesai Berpetualang</button>
+      {/* --- OUTRO --- */}
+      {phase === 4 && (
+        <div className="bg-white p-10 rounded-[40px] shadow-2xl text-center max-w-xl z-10 border-b-8 border-yellow-400 animate-in zoom-in duration-500">
+          <div className="text-[120px] mb-4 animate-bounce">🎖️🦉</div>
+          <h1 className="text-4xl font-black text-yellow-500 mb-4 tracking-wide">Misi Berhasil!</h1>
+          <p className="text-gray-600 text-lg font-medium leading-relaxed mb-8">
+            Terima kasih Detektif! Berkat matamu yang tajam, Kiki berhasil menemukan kacamata dan barang-barangnya. 
+            Kiki memberimu lencana Bintang Emas!
+          </p>
+          <button 
+            onClick={finishGame} 
+            className="w-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900 py-4 rounded-3xl font-black text-xl shadow-[0_6px_0_#CA8A04] active:translate-y-2 active:shadow-none transition-all"
+          >
+            Ambil Lencana & Selesai ✨
+          </button>
         </div>
       )}
     </div>

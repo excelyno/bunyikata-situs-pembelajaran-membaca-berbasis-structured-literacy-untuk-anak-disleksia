@@ -69,11 +69,9 @@ export default function SiswaDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           
           {/* 1. PETUALANG GURIBUU (MOTORIK) */}
-          <div className={`flex flex-col p-6 rounded-[32px] border-b-8 border-[#FDE9D2] bg-[#FFF6ED] shadow-sm 
-            ${recommendation === 'motorik' ? 'ring-4 ring-[#D97736] ring-offset-4 ring-offset-[#FFFDF9]' : ''}`}
-          >
+          <div className="flex flex-col p-6 rounded-[32px] border-b-8 border-[#FDE9D2] bg-[#FFF6ED] shadow-sm">
             {/* Header Card */}
-            <div className="mb-4 text-center">
+            <div className="mb-4 text-center">  
               <h3 className="text-2xl font-black text-[#D97736] leading-tight">Petualang Guribuu</h3>
             </div>
 
@@ -102,9 +100,7 @@ export default function SiswaDashboard() {
           </div>
 
           {/* 2. PETARUNG GURIBUU (AUDITORI) */}
-          <div className={`flex flex-col p-6 rounded-[32px] border-b-8 border-[#DCE8D4] bg-[#F1F6EC] shadow-sm 
-            ${recommendation === 'auditori' ? 'ring-4 ring-[#4A7C59] ring-offset-4 ring-offset-[#FFFDF9]' : ''}`}
-          >
+          <div className="flex flex-col p-6 rounded-[32px] border-b-8 border-[#DCE8D4] bg-[#F1F6EC] shadow-sm">
             <div className="mb-4 text-center">
               <h3 className="text-2xl font-black text-[#4A7C59] leading-tight">Petarung Guribuu</h3>
             </div>
@@ -132,9 +128,7 @@ export default function SiswaDashboard() {
           </div>
 
           {/* 3. DETEKTIF GURIBUU (VISUAL) */}
-          <div className={`flex flex-col p-6 rounded-[32px] border-b-8 border-[#E6DDF0] bg-[#F4F0F8] shadow-sm 
-            ${recommendation === 'visual' ? 'ring-4 ring-[#715B8E] ring-offset-4 ring-offset-[#FFFDF9]' : ''}`}
-          >
+          <div className="flex flex-col p-6 rounded-[32px] border-b-8 border-[#E6DDF0] bg-[#F4F0F8] shadow-sm">
             <div className="mb-4 text-center">
               <h3 className="text-2xl font-black text-[#715B8E] leading-tight">Detektif Guribuu</h3>
             </div>

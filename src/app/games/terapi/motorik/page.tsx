@@ -1,75 +1,75 @@
 "use client";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import HeroImage from "../../public/hero/gorogu-landing.png"
 
 export default function MotorikMenu() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-100 p-6 flex flex-col items-center justify-center relative">
+    <div className="min-h-screen bg-[#FFFDF9] p-6 flex flex-col items-center justify-center relative font-sans pb-20">
       
       {/* Tombol Kembali */}
       <button 
         onClick={() => router.push("/dashboard/siswa")}
-        className="absolute top-6 left-6 w-12 h-12 bg-white rounded-full flex items-center justify-center font-black text-xl text-orange-600 shadow-md hover:scale-110 active:scale-95 transition-all"
+        className="absolute top-6 left-6 w-14 h-14 bg-white rounded-full flex items-center justify-center font-black text-2xl text-[#8D7B68] shadow-sm border-2 border-[#E2E8F0] hover:bg-gray-50 hover:-translate-x-1 active:scale-95 transition-all z-10"
       >
         {"<"}
       </button>
 
       {/* Header */}
-      <div className="text-center mb-12">
-        <div className="text-8xl mb-4 animate-bounce">✍️</div>
-        <h1 className="text-4xl font-black text-orange-700 mb-2">Terapi Motorik</h1>
-        <p className="text-orange-800 font-medium max-w-md mx-auto">
-          Pilih kegiatan yang ingin kamu lakukan. Latih kemampuan menulis huruf dan angka dengan seru!
+      <div className="text-center mb-12 mt-10">
+        <div className="w-52 h-52 mx-auto mb-6 flex items-center justify-center hover:scale-105 transition-transform duration-300">
+          <img src="/hero/gorogu-landing.png" alt="Gorogu" className="w-full h-full object-contain drop-shadow-xl" />
+        </div>
+        <h1 className="text-4xl md:text-5xl font-black text-[#5C4D4A] mb-4 tracking-wide">
+          Petualangan Gorogu
+        </h1>
+        <p className="text-[#8D7B68] font-bold max-w-lg mx-auto text-lg md:text-xl leading-relaxed tracking-wide px-4">
+        Persiapkan diri dan ikut berpetualang dengan Goroguu
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl px-4">
         
         {/* Mode Belajar */}
         <div 
           onClick={() => router.push("/games/terapi/motorik/belajar")}
-          className="bg-white p-8 rounded-[40px] border-b-8 border-orange-200 cursor-pointer hover:-translate-y-2 hover:border-orange-300 transition-all flex flex-col items-center text-center group shadow-lg"
+          className="bg-[#FFF6ED] p-8 rounded-[40px] border-b-8 border-[#FDE9D2] cursor-pointer hover:-translate-y-2 hover:border-[#D97736] transition-all flex flex-col items-center text-center group shadow-sm hover:shadow-xl"
         >
-          <div className="w-24 h-24 bg-orange-100 rounded-full flex items-center justify-center text-5xl mb-6 group-hover:scale-110 transition-transform shadow-inner">
-            ✏️
+          <div className="w-28 h-28 bg-white rounded-full flex items-center justify-center text-6xl mb-6 group-hover:scale-110 group-hover:-rotate-12 transition-transform shadow-sm">
+            ▶️
           </div>
-          <h2 className="text-2xl font-black text-gray-800 mb-2">Belajar</h2>
-          <p className="text-sm text-gray-600 mb-1 font-semibold">(Menulis)</p>
-          <p className="text-gray-500 font-medium text-sm">
-            Latih kemampuan menulis huruf dan angka dengan seru!
+          <h2 className="text-3xl font-black text-[#D97736] mb-3 tracking-wide">Belajar Menulis</h2>
+          <p className="text-[#8D7B68] font-bold text-lg leading-relaxed tracking-wide mb-8">
+            Mari berlatih membuat huruf dan angka dengan cara yang menyenangkan!
           </p>
-          <button className="mt-6 bg-orange-600 text-white px-6 py-3 rounded-full font-black text-sm hover:bg-orange-700 active:scale-95 transition-all">
-            Ayo Belajar!
+          <button className="mt-auto bg-[#D97736] text-white px-8 py-4 rounded-full font-black text-xl hover:bg-[#C2652A] shadow-[0_6px_0_#A85522] active:translate-y-2 active:shadow-none transition-all flex items-center gap-3">
+            Mulai Belajar <span>→</span>
           </button>
         </div>
 
-        {/* Mode Petualangan (Budi) */}
+        {/* Mode Petualangan */}
         <div 
           onClick={() => router.push("/games/terapi/motorik/petualangan")}
-          className="bg-white p-8 rounded-[40px] border-b-8 border-orange-200 cursor-pointer hover:-translate-y-2 hover:border-orange-300 transition-all flex flex-col items-center text-center group shadow-lg"
+          className="bg-[#F1F6EC] p-8 rounded-[40px] border-b-8 border-[#DCE8D4] cursor-pointer hover:-translate-y-2 hover:border-[#4A7C59] transition-all flex flex-col items-center text-center group shadow-sm hover:shadow-xl"
         >
-          <div className="w-24 h-24 bg-orange-100 rounded-full flex items-center justify-center text-5xl mb-6 group-hover:scale-110 transition-transform shadow-inner">
-            🧒
+          <div className="w-28 h-28 bg-white rounded-full flex items-center justify-center text-6xl mb-6 group-hover:scale-110 group-hover:rotate-12 transition-transform shadow-sm">
+            🎒
           </div>
-          <h2 className="text-2xl font-black text-gray-800 mb-2">Berpetualang</h2>
-          <p className="text-sm text-gray-600 mb-1 font-semibold">(Game Test)</p>
-          <p className="text-gray-500 font-medium text-sm">
-            Selesaikan misi menulis dan bantu Budi sampai ke taman!
+          <h2 className="text-3xl font-black text-[#4A7C59] mb-3 tracking-wide">Berpetualang</h2>
+          <p className="text-[#8D7B68] font-bold text-lg leading-relaxed tracking-wide mb-8">
+            Bantu Guribuu melewati rintangan dengan kekuatan menulismu!
           </p>
-          <button className="mt-6 bg-orange-600 text-white px-6 py-3 rounded-full font-black text-sm hover:bg-orange-700 active:scale-95 transition-all">
-            Ayo Petualang!
+          <button className="mt-auto bg-[#4A7C59] text-white px-8 py-4 rounded-full font-black text-xl hover:bg-[#3B6648] shadow-[0_6px_0_#2E523A] active:translate-y-2 active:shadow-none transition-all flex items-center gap-3">
+            Mulai Petualangan <span>→</span>
           </button>
         </div>
 
       </div>
 
       {/* Footer Info */}
-      <div className="mt-8 text-center max-w-2xl">
-        <p className="text-sm text-orange-700 font-medium flex items-center justify-center gap-2">
-          💡 <span>Latihan otot akan membuatmu semakin kuat dan bisa menulis lebih baik!</span>
+      <div className="mt-16 text-center w-full max-w-2xl bg-[#FFF6ED] px-8 py-5 rounded-3xl border-2 border-[#D97736]/30 shadow-sm">
+        <p className="text-lg text-[#D97736] font-bold flex items-center justify-center gap-4 tracking-wide leading-relaxed">
+          <span className="text-3xl animate-pulse">💡</span> Tangan yang kuat akan membuat tulisanmu lebih indah!
         </p>
       </div>
     </div>
