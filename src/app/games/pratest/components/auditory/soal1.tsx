@@ -30,25 +30,34 @@ export default function AuditorySoal1({ onAnswer }: Props) {
   };
 
   return (
-    <div className="animate-in fade-in slide-in-from-right duration-500">
-      <h2 className="text-3xl font-black text-gray-800 mb-4">Dengarkan Kata Ini!</h2>
+    <div className="animate-in fade-in slide-in-from-right duration-500 w-full flex flex-col items-center">
       
-      {/* Tombol Target Audio */}
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-black text-[#5C4D4A] mb-2">Dengarkan Kata Ini!</h2>
+        <p className="text-[#8D7B68] font-medium text-lg">Tekan tombol suara di bawah ini 🎧</p>
+      </div>
+      
+      {/* Tombol Target Audio - Dibuat mirip kartu besar seperti di referensi desain */}
       <button 
         onClick={() => playAudio("ayam")}
-        className="w-32 h-32 mx-auto bg-purple-100 text-purple-600 rounded-full border-b-8 border-purple-300 hover:translate-y-2 active:border-b-0 transition-all flex flex-col items-center justify-center mb-8 shadow-sm"
+        className="w-40 h-40 mx-auto bg-[#FFF8F0] text-[#EF9550] rounded-[32px] border-2 border-b-[8px] border-[#FDE9D2] hover:border-[#EF9550] hover:bg-[#FFF4E8] hover:-translate-y-2 active:border-b-2 active:translate-y-2 transition-all flex flex-col items-center justify-center mb-10 group"
       >
-        <span className="text-5xl mb-2">🔊</span>
-        <span className="font-bold text-sm">ayam</span>
+        <span className="text-6xl mb-2 group-hover:scale-110 transition-transform duration-300">🔊</span>
+        {/* Catatan: Untuk tes audiotory sungguhan, teks "ayam" ini idealnya disembunyikan agar anak benar-benar menebak dari suara. Tapi saya pertahankan sesuai kodemu. */}
+        <span className="font-bold text-lg text-[#8D7B68] group-hover:text-[#EF9550] transition-colors">ayam</span>
       </button>
 
-      <p className="text-gray-500 font-medium mb-6">Pilih kata yang bunyi awalannya sama!</p>
+      <p className="text-[#8D7B68] font-bold mb-6 text-xl text-center">
+        Pilih kata yang bunyi awalannya <span className="text-[#EF9550] font-black text-2xl mx-1">sama</span>!
+      </p>
       
-      <div className="flex justify-center gap-4">
+      {/* Area Pilihan Jawaban */}
+      <div className="flex flex-wrap justify-center gap-4 w-full max-w-md mx-auto">
         {["apel", "buku", "cacing"].map((kata) => (
           <button 
-            key={kata} onClick={() => handleClick(kata)}
-            className="px-6 py-4 bg-blue-50 text-blue-600 text-xl font-black rounded-3xl border-b-4 border-blue-200 hover:bg-blue-100 active:border-b-0 transition-all"
+            key={kata} 
+            onClick={() => handleClick(kata)}
+            className="flex-1 min-w-[100px] py-5 bg-[#FFF8F0] text-[#5C4D4A] text-2xl font-black rounded-[20px] border-2 border-b-[6px] border-[#FDE9D2] hover:border-[#EF9550] hover:text-[#EF9550] hover:bg-[#FFF4E8] hover:-translate-y-1 active:border-b-2 active:translate-y-1 transition-all"
           >
             {kata}
           </button>

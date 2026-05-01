@@ -28,20 +28,31 @@ export default function MotorikSoal2({ onAnswer }: Props) {
   const pilihan = ["b", "d", "p", "q"];
 
   return (
-    <div className="animate-in fade-in slide-in-from-right duration-500">
-      <h2 className="text-5xl font-black text-gray-800 mb-2">D</h2>
-      <p className="text-gray-500 font-medium mb-10 text-lg">Cari teman kecilnya!</p>
+    <div className="animate-in fade-in duration-500 w-full flex flex-col items-center">
+      <p className="text-[#5C4033] font-bold text-xl md:text-2xl mb-8">Cari teman kecilnya!</p>
       
-      <div className="grid grid-cols-2 gap-6 max-w-xs mx-auto">
-        {pilihan.map((huruf) => (
-          <button 
-            key={huruf}
-            onClick={() => handleClick(huruf)}
-            className="h-24 bg-blue-50 text-blue-600 text-5xl font-black rounded-3xl border-b-8 border-blue-200 hover:bg-blue-100 hover:translate-y-1 active:border-b-0 active:translate-y-2 transition-all flex items-center justify-center"
-          >
-            {huruf}
-          </button>
-        ))}
+      {/* Target Box */}
+      <div className="w-40 h-40 md:w-48 md:h-48 bg-[#FFF8EF] rounded-3xl border border-[#FDE9D2] flex items-center justify-center mb-10 shadow-sm">
+        <span className="text-[80px] md:text-[100px] font-black text-[#5C4033] leading-none">D</span>
+      </div>
+      
+      {/* Options */}
+      <div className="flex flex-wrap justify-center gap-4 max-w-lg mx-auto">
+        {pilihan.map((huruf, index) => {
+          // Memberikan warna yang berbeda-beda untuk tiap huruf agar lebih menarik
+          const colors = ['#F18230', '#4CAF50', '#2196F3', '#E91E63'];
+          const color = colors[index % colors.length];
+          return (
+            <button 
+              key={huruf}
+              onClick={() => handleClick(huruf)}
+              style={{ color }}
+              className="w-24 h-24 md:w-28 md:h-28 bg-white text-[50px] md:text-[60px] font-black rounded-3xl border-2 border-gray-100 hover:border-gray-300 hover:bg-gray-50 hover:scale-105 active:scale-95 transition-all shadow-sm flex items-center justify-center leading-none"
+            >
+              {huruf}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

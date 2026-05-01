@@ -25,24 +25,30 @@ export default function VisualSoal1({ onAnswer }: Props) {
   };
 
   return (
-    <div className="h-64 flex flex-col justify-center animate-in fade-in duration-500">
+    <div className="flex flex-col justify-center items-center animate-in fade-in duration-500 w-full min-h-[300px]">
       {showWord ? (
-        <div className="animate-pulse">
-          <h2 className="text-6xl font-black text-gray-800 tracking-widest">rumah</h2>
-          <p className="text-gray-400 mt-4 font-medium">Ingat kata ini...</p>
+        <div className="animate-pulse flex flex-col items-center">
+          <div className="w-64 h-32 md:w-80 md:h-40 bg-[#FFF8EF] rounded-3xl border border-[#FDE9D2] flex items-center justify-center mb-6 shadow-sm">
+            <h2 className="text-5xl md:text-6xl font-black text-[#5C4033] tracking-widest">rumah</h2>
+          </div>
+          <p className="text-[#8D7B68] font-bold text-xl">Ingat kata ini...</p>
         </div>
       ) : (
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <p className="text-gray-500 font-medium mb-8 text-xl">Kata apa yang tadi muncul?</p>
-          <div className="flex justify-center gap-6">
-            {["rumha", "rumah"].map((kata) => (
-              <button 
-                key={kata} onClick={() => handleClick(kata)}
-                className="px-8 py-6 bg-blue-50 text-blue-600 text-3xl font-black rounded-3xl border-b-8 border-blue-200 hover:bg-blue-100 hover:translate-y-2 active:border-b-0 transition-all"
-              >
-                {kata}
-              </button>
-            ))}
+        <div className="animate-in zoom-in duration-300 flex flex-col items-center w-full">
+          <p className="text-[#5C4033] font-bold text-xl md:text-2xl mb-10">Kata apa yang tadi muncul?</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-6 w-full max-w-md">
+            {["rumha", "rumah"].map((kata, index) => {
+              const color = index === 0 ? '#F18230' : '#4CAF50';
+              return (
+                <button 
+                  key={kata} onClick={() => handleClick(kata)}
+                  className="flex-1 py-6 bg-white text-3xl font-black rounded-3xl border-2 border-gray-100 hover:border-gray-300 hover:bg-gray-50 hover:scale-105 active:scale-95 transition-all shadow-sm flex items-center justify-center"
+                  style={{ color }}
+                >
+                  {kata}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
