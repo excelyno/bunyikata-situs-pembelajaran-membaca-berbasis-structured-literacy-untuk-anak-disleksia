@@ -49,20 +49,27 @@ export default function VisualSoal3({ onAnswer }: Props) {
   };
 
   return (
-    <div className="animate-in fade-in slide-in-from-right duration-500">
-      <h2 className="text-4xl font-black text-gray-800 mb-2">B</h2>
-      <p className="text-gray-500 font-medium mb-6 text-lg">Buang semua huruf KECUALI huruf <b>b</b> !</p>
+    <div className="animate-in fade-in slide-in-from-right duration-500 w-full flex flex-col items-center">
       
-      <div className="grid grid-cols-3 gap-3 w-64 mx-auto mb-6">
+      {/* Target huruf yang harus disisakan, dibuat seperti kartu */}
+      <div className="bg-[#FFF4E8] px-8 py-4 rounded-[20px] border-4 border-[#FDE9D2] shadow-sm mb-4">
+        <h2 className="text-5xl font-black text-[#5C4D4A]">b</h2>
+      </div>
+      
+      <p className="text-[#8D7B68] font-bold mb-8 text-xl text-center">
+        Buang semua huruf KECUALI huruf <span className="text-[#EF9550] font-black text-2xl mx-1">b</span> !
+      </p>
+      
+      <div className="grid grid-cols-3 gap-4 w-72 mx-auto mb-8">
         {grid.map((item) => (
           <button 
             key={item.id}
             onClick={() => handleBoxClick(item.id, item.letter)}
             disabled={!item.visible}
-            className={`h-20 text-4xl font-black rounded-2xl transition-all duration-300 flex items-center justify-center
+            className={`h-20 text-4xl font-black rounded-[20px] transition-all duration-300 flex items-center justify-center
               ${item.visible 
-                ? "bg-blue-50 text-blue-600 border-b-4 border-blue-200 hover:bg-blue-100 active:border-b-0 active:translate-y-1" 
-                : "bg-transparent text-transparent opacity-0 cursor-default" // Menghilang
+                ? "bg-[#FFF8F0] text-[#5C4D4A] border-2 border-b-[6px] border-[#FDE9D2] hover:border-[#EF9550] hover:text-[#EF9550] hover:bg-[#FFF4E8] hover:-translate-y-1 active:border-b-2 active:translate-y-1" 
+                : "bg-transparent text-transparent opacity-0 cursor-default scale-50" // Efek mengecil lalu menghilang
               }`}
           >
             {item.letter}
@@ -70,16 +77,21 @@ export default function VisualSoal3({ onAnswer }: Props) {
         ))}
       </div>
 
-      {isFinished ? (
-        <button 
-          onClick={handleLanjut}
-          className="bg-green-500 text-white px-8 py-3 rounded-2xl font-bold text-xl animate-bounce shadow-[0_6px_0_#166534]"
-        >
-          Selesai! Lanjut
-        </button>
-      ) : (
-        <p className="text-sm text-gray-400">Klik kotak untuk menghapusnya...</p>
-      )}
+      {/* Area Tombol Lanjut / Petunjuk */}
+      <div className="h-16 flex items-center justify-center">
+        {isFinished ? (
+          <button 
+            onClick={handleLanjut}
+            className="bg-[#EF9550] text-white px-10 py-4 rounded-[20px] font-black text-xl hover:bg-[#D17A20] transition-all shadow-[0_6px_0_#CB7A3E] active:translate-y-2 active:shadow-none animate-bounce"
+          >
+            Selesai! Lanjut 🚀
+          </button>
+        ) : (
+          <p className="text-sm font-medium text-[#8D7B68] bg-[#FDE9D2]/50 px-4 py-2 rounded-full">
+            👆 Klik kotak untuk menghapusnya...
+          </p>
+        )}
+      </div>
     </div>
   );
 }

@@ -31,21 +31,26 @@ export default function MotorikSoal1({ onAnswer }: Props) {
   };
 
   return (
-    <div className="animate-in fade-in zoom-in duration-500">
-      <h2 className="text-4xl font-black text-gray-800 mb-2">B</h2>
-      <p className="text-gray-500 font-medium mb-10 text-lg">Pilih huruf kecil yang bentuknya sama!</p>
+    <div className="animate-in fade-in duration-500 w-full flex flex-col items-center">
+      <p className="text-[#5C4033] font-bold text-xl md:text-2xl mb-8">Pilih huruf kecil yang bentuknya sama!</p>
       
-      <div className="flex justify-center gap-8">
+      {/* Target Box (Kotak Besar) */}
+      <div className="w-48 h-48 md:w-56 md:h-56 bg-[#FFF8EF] rounded-3xl border border-[#FDE9D2] flex items-center justify-center mb-10 shadow-sm">
+        <span className="text-[100px] md:text-[120px] font-black text-[#5C4033] leading-none">B</span>
+      </div>
+      
+      {/* Options */}
+      <div className="flex justify-center gap-6 w-full">
         <button 
           onClick={() => handleClick("d")}
-          className="w-32 h-32 bg-blue-50 text-blue-600 text-6xl font-black rounded-3xl border-b-8 border-blue-200 hover:bg-blue-100 hover:translate-y-2 transition-all active:border-b-0 flex items-center justify-center"
+          className="w-32 h-32 md:w-40 md:h-40 bg-white text-[#F18230] text-[70px] md:text-[90px] font-black rounded-3xl border-2 border-gray-100 hover:border-[#F18230] hover:bg-[#FFF8EF] hover:scale-105 active:scale-95 transition-all shadow-sm flex items-center justify-center leading-none"
         >
           d
         </button>
 
         <button 
           onClick={() => handleClick("b")}
-          className="w-32 h-32 bg-blue-50 text-blue-600 text-6xl font-black rounded-3xl border-b-8 border-blue-200 hover:bg-blue-100 hover:translate-y-2 transition-all active:border-b-0 flex items-center justify-center"
+          className="w-32 h-32 md:w-40 md:h-40 bg-white text-[#4CAF50] text-[70px] md:text-[90px] font-black rounded-3xl border-2 border-gray-100 hover:border-[#4CAF50] hover:bg-[#F2FAF3] hover:scale-105 active:scale-95 transition-all shadow-sm flex items-center justify-center leading-none"
         >
           b
         </button>

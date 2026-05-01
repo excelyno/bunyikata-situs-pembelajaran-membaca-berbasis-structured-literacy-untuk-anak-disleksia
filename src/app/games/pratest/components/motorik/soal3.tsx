@@ -61,16 +61,20 @@ export default function MotorikSoal3({ onAnswer }: Props) {
   };
 
   return (
-    <div className="animate-in fade-in slide-in-from-right duration-500">
-      <h2 className="text-3xl font-black text-gray-800 mb-2">Tulis huruf 'b'</h2>
-      <p className="text-gray-500 font-medium mb-6">Gunakan jarimu untuk menggambar!</p>
+    <div className="animate-in fade-in duration-500 w-full flex flex-col items-center">
+      <p className="text-[#5C4033] font-bold text-xl md:text-2xl mb-8">Ikuti garisnya untuk menulis huruf di bawah ini!</p>
       
-      <div className="flex justify-center mb-8">
+      <div className="flex justify-center mb-8 relative">
+        {/* Helper text di belakang canvas jika mau ditambah */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+          <span className="text-[200px] font-black text-[#F18230] leading-none">b</span>
+        </div>
+
         <canvas
           ref={canvasRef}
-          width={300}
-          height={300}
-          className="bg-yellow-50 border-4 border-dashed border-yellow-300 rounded-3xl touch-none cursor-crosshair"
+          width={280}
+          height={280}
+          className="bg-white border-4 border-dashed border-[#FDE9D2] rounded-[40px] touch-none cursor-crosshair shadow-sm z-10"
           onMouseDown={startDrawing}
           onMouseUp={stopDrawing}
           onMouseMove={draw}
@@ -84,12 +88,12 @@ export default function MotorikSoal3({ onAnswer }: Props) {
       <button 
         onClick={handleSubmit}
         disabled={!hasDrawn}
-        className={`px-8 py-3 rounded-2xl font-bold text-xl transition-all ${
-          hasDrawn ? "bg-green-500 text-white shadow-[0_6px_0_#166534] active:translate-y-2 active:shadow-none" 
-                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
+        className={`px-10 py-4 rounded-2xl font-black text-xl transition-all w-full max-w-sm flex items-center justify-center gap-2 ${
+          hasDrawn ? "bg-[#4CAF50] text-white shadow-[0_6px_0_#388E3C] hover:bg-[#43A047] active:translate-y-2 active:shadow-none" 
+                   : "bg-gray-100 text-gray-400 cursor-not-allowed border-2 border-gray-200"
         }`}
       >
-        Sudah Selesai!
+        Sudah Selesai! {hasDrawn && "➔"}
       </button>
     </div>
   );

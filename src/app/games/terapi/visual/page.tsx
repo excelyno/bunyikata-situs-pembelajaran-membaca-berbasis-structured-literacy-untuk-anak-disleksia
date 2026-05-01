@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 
-export default function MotorikMenu() {
+export default function VisualMenu() {
   const router = useRouter();
 
   return (
@@ -21,10 +21,10 @@ export default function MotorikMenu() {
           <img src="/hero/gorogu-landing.png" alt="Gorogu" className="w-full h-full object-contain drop-shadow-xl" />
         </div>
         <h1 className="text-4xl md:text-5xl font-black text-[#5C4D4A] mb-4 tracking-wide">
-          Petualangan Gorogu
+          Detektif Gorogu
         </h1>
         <p className="text-[#8D7B68] font-bold max-w-lg mx-auto text-lg md:text-xl leading-relaxed tracking-wide px-4">
-        Persiapkan diri dan ikut berpetualang dengan Goroguu
+          Persiapkan matamu dan ikut mencari jejak rahasia bersama Goroguu!
         </p>
       </div>
 
@@ -32,15 +32,15 @@ export default function MotorikMenu() {
         
         {/* Mode Belajar */}
         <div 
-          onClick={() => router.push("/games/terapi/motorik/belajar")}
+          onClick={() => router.push("/games/terapi/visual/belajar")}
           className="bg-[#FFF6ED] p-8 rounded-[40px] border-b-8 border-[#FDE9D2] cursor-pointer hover:-translate-y-2 hover:border-[#D97736] transition-all flex flex-col items-center text-center group shadow-sm hover:shadow-xl"
         >
           <div className="w-28 h-28 bg-white rounded-full flex items-center justify-center text-6xl mb-6 group-hover:scale-110 group-hover:-rotate-12 transition-transform shadow-sm">
             ▶️
           </div>
-          <h2 className="text-3xl font-black text-[#D97736] mb-3 tracking-wide">Belajar Menulis</h2>
+          <h2 className="text-3xl font-black text-[#D97736] mb-3 tracking-wide">Belajar Mencari</h2>
           <p className="text-[#8D7B68] font-bold text-lg leading-relaxed tracking-wide mb-8">
-            Mari berlatih membuat huruf dan angka dengan cara yang menyenangkan!
+            Mari berlatih membedakan huruf-huruf yang mirip dengan sangat teliti!
           </p>
           <button className="mt-auto bg-[#D97736] text-white px-8 py-4 rounded-full font-black text-xl hover:bg-[#C2652A] shadow-[0_6px_0_#A85522] active:translate-y-2 active:shadow-none transition-all flex items-center gap-3">
             Mulai Belajar <span>→</span>
@@ -49,15 +49,15 @@ export default function MotorikMenu() {
 
         {/* Mode Petualangan */}
         <div 
-          onClick={() => router.push("/games/terapi/motorik/petualangan")}
+          onClick={() => router.push("/games/terapi/visual/petualangan")}
           className="bg-[#F1F6EC] p-8 rounded-[40px] border-b-8 border-[#DCE8D4] cursor-pointer hover:-translate-y-2 hover:border-[#4A7C59] transition-all flex flex-col items-center text-center group shadow-sm hover:shadow-xl"
         >
           <div className="w-28 h-28 bg-white rounded-full flex items-center justify-center text-6xl mb-6 group-hover:scale-110 group-hover:rotate-12 transition-transform shadow-sm">
-            🎒
+            🕵️
           </div>
-          <h2 className="text-3xl font-black text-[#4A7C59] mb-3 tracking-wide">Berpetualang</h2>
+          <h2 className="text-3xl font-black text-[#4A7C59] mb-3 tracking-wide">Mencari Jejak</h2>
           <p className="text-[#8D7B68] font-bold text-lg leading-relaxed tracking-wide mb-8">
-            Bantu Guribuu melewati rintangan dengan kekuatan menulismu!
+            Bantu Goroguu menemukan barang-barang yang hilang dengan matamu!
           </p>
           <button className="mt-auto bg-[#4A7C59] text-white px-8 py-4 rounded-full font-black text-xl hover:bg-[#3B6648] shadow-[0_6px_0_#2E523A] active:translate-y-2 active:shadow-none transition-all flex items-center gap-3">
             Mulai Petualangan <span>→</span>
@@ -69,7 +69,7 @@ export default function MotorikMenu() {
       {/* Footer Info */}
       <div className="mt-16 text-center w-full max-w-2xl bg-[#FFF6ED] px-8 py-5 rounded-3xl border-2 border-[#D97736]/30 shadow-sm">
         <p className="text-lg text-[#D97736] font-bold flex items-center justify-center gap-4 tracking-wide leading-relaxed">
-          <span className="text-3xl animate-pulse">💡</span> Tangan yang kuat akan membuat tulisanmu lebih indah!
+          <span className="text-3xl animate-pulse">💡</span> Mata yang teliti akan membantumu mengenali kata dan huruf lebih mudah!
         </p>
       </div>
     </div>
