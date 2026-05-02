@@ -5,12 +5,16 @@ export default function AuditoriMenu() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-[#FFFDF9] p-6 flex flex-col items-center justify-center relative font-sans pb-20">
+    <div className="min-h-screen bg-[#FFF8F0] p-6 flex flex-col items-center justify-center relative font-sans pb-20 overflow-hidden">
       
+      {/* Dekorasi elemen organik background */}
+      <div className="absolute top-0 right-0 w-72 h-72 bg-[#FDE9D2] rounded-full translate-x-20 -translate-y-20 opacity-60" />
+      <div className="absolute bottom-0 left-0 w-56 h-56 bg-[#EF953322] rounded-full -translate-x-10 translate-y-10" />
+
       {/* Tombol Kembali */}
       <button 
         onClick={() => router.push("/dashboard/siswa")}
-        className="absolute top-6 left-6 w-14 h-14 bg-white rounded-full flex items-center justify-center font-black text-2xl text-[#8D7B68] shadow-sm border-2 border-[#E2E8F0] hover:bg-gray-50 hover:-translate-x-1 active:scale-95 transition-all z-10"
+        className="absolute top-6 left-6 w-14 h-14 bg-[#FFF9F2] rounded-full flex items-center justify-center font-black text-2xl text-[#8D7B68] shadow-sm border-2 border-orange-100 hover:bg-orange-50 hover:-translate-x-1 active:scale-95 transition-all z-10"
       >
         {"<"}
       </button>
@@ -21,7 +25,7 @@ export default function AuditoriMenu() {
           <img src="/hero/gorogu-landing.png" alt="gorobu" className="w-full h-full object-contain drop-shadow-xl" />
         </div>
         <h1 className="text-4xl md:text-5xl font-black text-[#5C4D4A] mb-4 tracking-wide">
-          Petarung gorobu
+          Petarung guribuuu!
         </h1>
         <p className="text-[#8D7B68] font-bold max-w-lg mx-auto text-lg md:text-xl leading-relaxed tracking-wide px-4">
           Persiapkan telingamu dan ikut bertarung bersama guribuuu!
@@ -35,7 +39,7 @@ export default function AuditoriMenu() {
           onClick={() => router.push("/games/terapi/auditori/belajar")}
           className="bg-[#FFF6ED] p-8 rounded-[40px] border-b-8 border-[#FDE9D2] cursor-pointer hover:-translate-y-2 hover:border-[#D97736] transition-all flex flex-col items-center text-center group shadow-sm hover:shadow-xl"
         >
-          <div className="w-28 h-28 bg-white rounded-full flex items-center justify-center text-6xl mb-6 group-hover:scale-110 group-hover:-rotate-12 transition-transform shadow-sm">
+          <div className="w-28 h-28 bg-[#FFF9F2] rounded-full flex items-center justify-center text-6xl mb-6 group-hover:scale-110 group-hover:-rotate-12 transition-transform shadow-sm">
             ▶️
           </div>
           <h2 className="text-3xl font-black text-[#D97736] mb-3 tracking-wide">Dengar & Kenali</h2>
@@ -52,7 +56,7 @@ export default function AuditoriMenu() {
           onClick={() => router.push("/games/terapi/auditori/petualangan")}
           className="bg-[#F1F6EC] p-8 rounded-[40px] border-b-8 border-[#DCE8D4] cursor-pointer hover:-translate-y-2 hover:border-[#4A7C59] transition-all flex flex-col items-center text-center group shadow-sm hover:shadow-xl"
         >
-          <div className="w-28 h-28 bg-white rounded-full flex items-center justify-center text-6xl mb-6 group-hover:scale-110 group-hover:rotate-12 transition-transform shadow-sm">
+          <div className="w-28 h-28 bg-[#FFF9F2] rounded-full flex items-center justify-center text-6xl mb-6 group-hover:scale-110 group-hover:rotate-12 transition-transform shadow-sm">
             ⚔️
           </div>
           <h2 className="text-3xl font-black text-[#4A7C59] mb-3 tracking-wide">Bertarung</h2>

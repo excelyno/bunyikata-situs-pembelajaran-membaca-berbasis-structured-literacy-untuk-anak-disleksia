@@ -10,7 +10,7 @@ export default function VisualMenu() {
       {/* Tombol Kembali */}
       <button 
         onClick={() => router.push("/dashboard/siswa")}
-        className="absolute top-6 left-6 w-14 h-14 bg-white rounded-full flex items-center justify-center font-black text-2xl text-[#8D7B68] shadow-sm border-2 border-[#E2E8F0] hover:bg-gray-50 hover:-translate-x-1 active:scale-95 transition-all z-10"
+        className="absolute top-6 left-6 w-14 h-14 bg-[#FFF9F2] rounded-full flex items-center justify-center font-black text-2xl text-[#8D7B68] shadow-sm border-2 border-orange-100 hover:bg-orange-50 hover:-translate-x-1 active:scale-95 transition-all z-10"
       >
         {"<"}
       </button>
@@ -35,7 +35,7 @@ export default function VisualMenu() {
           onClick={() => router.push("/games/terapi/visual/belajar")}
           className="bg-[#FFF6ED] p-8 rounded-[40px] border-b-8 border-[#FDE9D2] cursor-pointer hover:-translate-y-2 hover:border-[#D97736] transition-all flex flex-col items-center text-center group shadow-sm hover:shadow-xl"
         >
-          <div className="w-28 h-28 bg-white rounded-full flex items-center justify-center text-6xl mb-6 group-hover:scale-110 group-hover:-rotate-12 transition-transform shadow-sm">
+          <div className="w-28 h-28 bg-[#FFF9F2] rounded-full flex items-center justify-center text-6xl mb-6 group-hover:scale-110 group-hover:-rotate-12 transition-transform shadow-sm">
             ▶️
           </div>
           <h2 className="text-3xl font-black text-[#D97736] mb-3 tracking-wide">Belajar Mencari</h2>
@@ -52,8 +52,8 @@ export default function VisualMenu() {
           onClick={() => router.push("/games/terapi/visual/petualangan")}
           className="bg-[#F1F6EC] p-8 rounded-[40px] border-b-8 border-[#DCE8D4] cursor-pointer hover:-translate-y-2 hover:border-[#4A7C59] transition-all flex flex-col items-center text-center group shadow-sm hover:shadow-xl"
         >
-          <div className="w-28 h-28 bg-white rounded-full flex items-center justify-center text-6xl mb-6 group-hover:scale-110 group-hover:rotate-12 transition-transform shadow-sm">
-            🕵️
+          <div className="w-28 h-28 bg-[#FFF9F2] rounded-full flex items-center justify-center text-6xl mb-6 group-hover:scale-110 group-hover:rotate-12 transition-transform shadow-sm overflow-hidden p-4">
+            <img src="/hero/gorogu-landing.png" alt="guribuu" className="w-full h-full object-contain" />
           </div>
           <h2 className="text-3xl font-black text-[#4A7C59] mb-3 tracking-wide">Mencari Jejak</h2>
           <p className="text-[#8D7B68] font-bold text-lg leading-relaxed tracking-wide mb-8">

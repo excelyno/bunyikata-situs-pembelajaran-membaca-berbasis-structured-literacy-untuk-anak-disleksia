@@ -1,6 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { say } from "@/lib/speak";
+import HeroImage from "../../../../../../public/hero/gorogu-landing.png";
+
 
 // Kumpulan Data Flashcard
 const FLASHCARDS = {
@@ -93,24 +96,34 @@ export default function BelajarVisualFlashcard() {
     }
   };
 
-  const playSound = (word: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log(`Memutar suara kata: ${word}`);
-    // Integrasikan audio disini
+  const playSound = (word: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    say(word);
   };
+
+  // Efek: Otomatis bunyi saat kartu terbuka
+  useEffect(() => {
+    if (isRevealed && currentCard) {
+      say(currentCard.word);
+    }
+  }, [isRevealed, currentIndex, activeCategory]);
 
   const currentCard = FLASHCARDS[activeCategory][currentIndex];
   // Cek apakah ini kartu terakhir di kategori tersebut
   const isLastCard = currentIndex === FLASHCARDS[activeCategory].length - 1;
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] font-sans flex flex-col">
+    <div className="min-h-screen bg-[#FFF8F0] font-sans flex flex-col relative overflow-hidden">
       
+      {/* Dekorasi elemen organik background */}
+      <div className="absolute top-0 right-0 w-72 h-72 bg-[#FDE9D2] rounded-full translate-x-20 -translate-y-20 opacity-60" />
+      <div className="absolute bottom-0 left-0 w-56 h-56 bg-[#EF953322] rounded-full -translate-x-10 translate-y-10" />
+
       {/* HEADER */}
-      <header className="p-6 flex justify-between items-center max-w-5xl mx-auto w-full relative">
+      <header className="p-6 flex justify-between items-center max-w-5xl mx-auto w-full relative z-10">
         <button 
           onClick={() => step === "playing" ? setStep("menu") : router.back()}
-          className="w-14 h-14 bg-white rounded-full border-2 border-[#E2E8F0] shadow-sm flex items-center justify-center text-[#8D7B68] text-2xl font-black hover:bg-[#F4F0F8] hover:-translate-x-1 transition-all z-10"
+          className="w-14 h-14 bg-[#FFF9F2] rounded-full border-2 border-orange-100 shadow-sm flex items-center justify-center text-[#8D7B68] text-2xl font-black hover:bg-orange-50 hover:-translate-x-1 transition-all z-10"
         >
           ←
         </button>
@@ -123,7 +136,10 @@ export default function BelajarVisualFlashcard() {
       {step === "menu" && (
         <main className="flex-1 flex flex-col items-center px-6 mt-8">
           <div className="text-center mb-10">
-            <div className="text-6xl mb-4">🕵️‍♂️</div>
+            <div className="w-32 h-32 mx-auto mb-4 relative">
+              <img src={HeroImage.src} alt="Guribuu" className="w-full h-full object-contain drop-shadow-md animate-bounce-slow" />
+            </div>
+
             <h2 className="text-3xl font-black text-[#715B8E] mb-2 tracking-wide">Pilih Penyelidikanmu!</h2>
             <p className="text-[#8D7B68] font-medium text-lg">Mau belajar melihat bentuk kata apa hari ini?</p>
           </div>
@@ -133,7 +149,7 @@ export default function BelajarVisualFlashcard() {
               <button
                 key={cat}
                 onClick={() => startExploring(cat)}
-                className="group flex flex-col items-center p-8 bg-white rounded-[32px] border-b-8 border-[#E6DDF0] shadow-sm hover:-translate-y-2 hover:shadow-xl hover:border-[#715B8E] transition-all"
+                className="group flex flex-col items-center p-8 bg-[#FFF9F2] rounded-[32px] border-b-8 border-[#E6DDF0] shadow-sm hover:-translate-y-2 hover:shadow-xl hover:border-[#715B8E] transition-all"
               >
                 <div className="text-6xl group-hover:scale-110 transition-transform mb-4">
                   {cat === "hewan" ? "🐾" : cat === "buah" ? "🍎" : cat === "warna" ? "🎨" : "🎒"}
@@ -159,7 +175,7 @@ export default function BelajarVisualFlashcard() {
           {/* AREA KARTU */}
           <div 
             onClick={() => setIsRevealed(true)}
-            className={`w-full max-w-xl bg-white min-h-[400px] rounded-[48px] border-b-[12px] border-[#E2E8F0] shadow-sm flex flex-col items-center justify-center p-10 cursor-pointer transition-all duration-500 relative
+            className={`w-full max-w-xl bg-[#FFF9F2] min-h-[400px] rounded-[48px] border-b-[12px] border-[#E2E8F0] shadow-sm flex flex-col items-center justify-center p-10 cursor-pointer transition-all duration-500 relative
               ${!isRevealed ? "hover:scale-[1.02] hover:border-[#715B8E]/50" : ""}`}
           >
             {/* Tampilan Sebelum Diklik */}
@@ -211,7 +227,7 @@ export default function BelajarVisualFlashcard() {
               onClick={prevCard}
               disabled={currentIndex === 0}
               className={`flex-1 py-4 rounded-2xl font-black text-xl border-b-4 transition-all
-                ${currentIndex === 0 ? "bg-gray-100 text-gray-300 border-gray-200 cursor-not-allowed" : "bg-white text-[#715B8E] border-[#E6DDF0] hover:bg-gray-50 active:translate-y-1 active:border-b-0"}`}
+                ${currentIndex === 0 ? "bg-gray-100 text-gray-300 border-gray-200 cursor-not-allowed" : "bg-[#FFF9F2] text-[#715B8E] border-[#E6DDF0] hover:bg-orange-50 active:translate-y-1 active:border-b-0"}`}
             >
               Kembali
             </button>
@@ -222,7 +238,7 @@ export default function BelajarVisualFlashcard() {
                 ${!isRevealed 
                   ? "bg-gray-100 text-gray-300 border-gray-200 cursor-not-allowed" 
                   : isLastCard 
-                    ? "bg-emerald-500 text-white border-emerald-700 shadow-sm hover:bg-emerald-600 active:translate-y-1 active:border-b-0" 
+                    ? "bg-[#EF9533] text-white border-[#B35D26] shadow-sm hover:bg-orange-600 active:translate-y-1 active:border-b-0" 
                     : "bg-[#715B8E] text-white border-[#49395E] shadow-sm hover:bg-[#5E4B77] active:translate-y-1 active:border-b-0"}`}
             >
               {isLastCard ? "Selesai ✨" : "Selanjutnya ➔"}

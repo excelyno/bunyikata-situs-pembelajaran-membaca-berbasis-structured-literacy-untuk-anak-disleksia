@@ -126,10 +126,14 @@ export default function PratestGame() {
 
   // --- STATE 1-9 & TAMAT: PROSES GAME ---
   return (
-    <div className="min-h-screen bg-[#FFF8EF] flex flex-col items-center py-10 px-4 font-sans relative">
+    <div className="min-h-screen bg-[#FFF8F0] flex flex-col items-center py-10 px-4 font-sans relative overflow-hidden">
       
+      {/* Dekorasi elemen organik background */}
+      <div className="absolute top-0 right-0 w-72 h-72 bg-[#FDE9D2] rounded-full translate-x-20 -translate-y-20 opacity-60" />
+      <div className="absolute bottom-0 left-0 w-56 h-56 bg-[#EF953322] rounded-full -translate-x-10 translate-y-10" />
+
       {/* Header dengan Tombol Back (Hanya tampil saat proses game) */}
-      <div className="w-full max-w-2xl flex items-center mb-6">
+      <div className="w-full max-w-2xl flex items-center mb-6 z-10">
         <button 
           onClick={() => setShowExitConfirm(true)}
           className="w-12 h-12 bg-white rounded-full flex items-center justify-center font-black text-xl text-[#8D7B68] hover:bg-[#FDE9D2] hover:text-[#F18230] transition-all shadow-sm"

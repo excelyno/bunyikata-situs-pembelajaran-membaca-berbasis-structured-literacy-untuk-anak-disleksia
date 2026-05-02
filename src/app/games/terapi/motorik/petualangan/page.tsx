@@ -28,7 +28,7 @@ interface LogEntry {
   errorCategory: string;
 }
 
-export default function MotorikBudi() {
+export default function Motorikguribu() {
   const router = useRouter();
 
   // === STATE SCENE ===
@@ -43,6 +43,8 @@ export default function MotorikBudi() {
   const [mistakes, setMistakes] = useState(0);
   const taskStartTime = useRef<number>(Date.now());
   const sessionStartTime = useRef<number>(Date.now());
+  const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
+
 
   // Reset timer setiap soal/scene berubah
   useEffect(() => {
@@ -60,17 +62,17 @@ export default function MotorikBudi() {
   };
 
   useEffect(() => {
-    if (scene === "intro") playAudio("Halo! Budi ingin pergi ke suatu taman. Bantu Budi menyelesaikan soal-soal ini agar sampai di taman ya!");
+    if (scene === "intro") playAudio("Halo! guribu ingin pergi ke suatu taman. Bantu guribu menyelesaikan soal-soal ini agar sampai di taman ya!");
     if (scene === "lvl1") playAudio(`Ayo tulis huruf ${LEVEL_1_TASKS[taskIndex]} di dalam kotak!`);
     if (scene === "trans1") playAudio("Hebat sekali! Jalan menuju taman mulai terbuka. Ayo lanjutkan!");
-    if (scene === "lvl2") playAudio(`Budi kebingungan nih. Pindahkan huruf ${LEVEL_2_TASKS[taskIndex].target} ke dalam kotak kosong ya!`);
+    if (scene === "lvl2") playAudio(`guribu kebingungan nih. Pindahkan huruf ${LEVEL_2_TASKS[taskIndex].target} ke dalam kotak kosong ya!`);
     if (scene === "trans2") playAudio("Wah, kamu pintar sekali! Tinggal satu bukit lagi di Misi Kombinasi.");
     if (scene === "lvl3") {
       const task = LEVEL_3_TASKS[taskIndex];
       if (task.type === "write") playAudio(`Tulis huruf ${task.target} ikuti garisnya!`);
       else playAudio(`Pilih dan pindahkan huruf ${task.target} dari tiga pilihan ini!`);
     }
-    if (scene === "outro") playAudio("Yeay! Budi sudah sampai di taman! Sebagai penutup, tulis huruf favoritmu di sini ya!");
+    if (scene === "outro") playAudio("Yeay! guribu sudah sampai di taman! Sebagai penutup, tulis huruf favoritmu di sini ya!");
   }, [scene, taskIndex]);
 
   // === HELPER: Catat satu log ===
@@ -100,6 +102,7 @@ export default function MotorikBudi() {
       if (taskIndex < LEVEL_2_TASKS.length - 1) setTaskIndex(p => p + 1);
       else { setTaskIndex(0); setScene("trans2"); }
     } else {
+      setFeedback("wrong");
       playAudio("O-ow, sepertinya itu huruf yang berbeda. Coba lihat lagi!");
     }
   };
@@ -118,7 +121,10 @@ export default function MotorikBudi() {
     setDraggedLetter(null);
 
     if (isCorrect) advanceLvl3();
-    else playAudio("Bukan yang itu, ayo cari lagi!");
+    else {
+      setFeedback("wrong");
+      playAudio("Bukan yang itu, ayo cari lagi!");
+    }
   };
 
   const advanceLvl3 = () => {
@@ -142,13 +148,13 @@ export default function MotorikBudi() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          sessionType: "TERAPI_MOTORIK_BUDI",
+          sessionType: "TERAPI_MOTORIK_guribu",
           durationSec,
           score,
           logs,
         }),
       });
-      console.log("✅ Skor Motorik Budi berhasil dikirim:", { score, durationSec, mistakes, logs });
+      console.log("✅ Skor Motorik guribu berhasil dikirim:", { score, durationSec, mistakes, logs });
     } catch (err) {
       console.error("❌ Gagal submit skor:", err);
     }
@@ -162,30 +168,70 @@ export default function MotorikBudi() {
       className="w-full h-screen bg-cover bg-center flex flex-col justify-end relative overflow-hidden"
       style={{ backgroundImage: "url(/bg/pemandangan-background.png)" }}
     >
-      <img src={HeroImage.src} alt="Budi" className="absolute bottom-20 left-10 w-64 md:w-80" />
-      <div className="bg-white/75 backdrop-blur-md border-t-8 border-orange-500 p-6 md:p-8 w-full min-h-[20vh] shadow-[0_-10px_30px_rgba(0,0,0,0.1)] z-10 flex flex-col justify-between">
-        <p className="text-xl md:text-2xl text-gray-900 font-bold leading-relaxed max-w-4xl">{text}</p>
-        <div className="flex justify-end mt-4">
-          <button onClick={onNext} className="bg-green-600 text-white px-8 py-3 rounded-full font-black text-lg shadow-[0_6px_0_#166534] active:translate-y-2 active:shadow-none hover:bg-green-700 transition-all flex items-center gap-2">
-            Lanjut Petualangan <span>→</span>
+      {/* KARAKTER GURIBUU */}
+      <img 
+        src={HeroImage.src} 
+        alt="guribu" 
+        className="absolute bottom-[18%] sm:bottom-32 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-10 w-48 sm:w-64 md:w-80 transition-all duration-700" 
+      />
+
+      {/* KOTAK DIALOG (TRANSPARAN) */}
+      <div className="bg-white/30 backdrop-blur-sm border-t-4 sm:border-t-8 border-orange-500/80 p-5 pb-3 sm:p-8 sm:pb-6 w-full min-h-[18vh] sm:min-h-[20vh] shadow-[0_-10px_30px_rgba(0,0,0,0.05)] z-10 flex flex-col justify-between">
+        <p className="text-lg sm:text-xl md:text-2xl text-gray-900 font-bold leading-relaxed max-w-4xl drop-shadow-sm">
+          {text}
+        </p>
+        <div className="flex justify-end mt-2 sm:mt-4">
+          <button 
+            onClick={onNext} 
+            className="bg-green-600/90 text-white px-6 py-2 sm:px-8 sm:py-3 rounded-full font-black text-sm sm:text-lg shadow-[0_4px_0_#166534] sm:shadow-[0_6px_0_#166534] active:translate-y-1 sm:active:translate-y-2 active:shadow-none hover:bg-green-700 transition-all flex items-center gap-2"
+          >
+            Lanjut <span>→</span>
           </button>
         </div>
       </div>
     </div>
   );
 
+
+
   return (
-    <div className="min-h-screen bg-orange-50 font-sans flex flex-col items-center justify-center relative">
+    <div className="min-h-screen bg-[#FFF8F0] font-sans flex flex-col items-center justify-center relative overflow-hidden">
+      
+      {/* ===== FEEDBACK POPUP ===== */}
+      {feedback && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className={`bg-[#FFF9F2] rounded-[40px] p-8 max-w-sm w-full text-center shadow-2xl border-b-8 border-red-400 animate-in zoom-in duration-300`}>
+            <div className="w-32 h-32 mx-auto mb-4 animate-bounce">
+              <img src={HeroImage.src} alt="Guribuu" className="w-full h-full object-contain drop-shadow-md" />
+            </div>
+            <h3 className="text-2xl font-black mb-2 text-red-500">Ayo Coba Lagi!</h3>
+            <p className="text-gray-900 font-medium mb-6">
+              Wah, belum tepat! Guribuu yakin kamu bisa, ayo lebih teliti lagi ya! 🧐
+            </p>
+            <button 
+              onClick={() => setFeedback(null)}
+              className="w-full bg-[#F18230] text-white py-3 rounded-2xl font-black shadow-[0_4px_0_#C56521] active:translate-y-1 active:shadow-none"
+            >
+              Coba Lagi 💪
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Dekorasi elemen organik background */}
+      <div className="absolute top-0 right-0 w-72 h-72 bg-[#FDE9D2] rounded-full translate-x-20 -translate-y-20 opacity-60" />
+      <div className="absolute bottom-0 left-0 w-56 h-56 bg-[#EF953322] rounded-full -translate-x-10 translate-y-10" />
+
       {/* Tombol Keluar */}
-      <button onClick={() => router.push("/games/terapi/motorik")} className="absolute top-6 left-6 w-12 h-12 bg-white text-orange-500 rounded-full flex items-center justify-center font-black text-xl shadow-md hover:scale-110 z-50">{"<"}</button>
+      <button onClick={() => router.push("/games/terapi/motorik")} className="absolute top-6 left-6 w-12 h-12 bg-[#FFF9F2] text-orange-500 rounded-full flex items-center justify-center font-black text-xl shadow-md hover:scale-110 z-50">{"<"}</button>
 
       {/* Indikator Progres & Skor Live */}
       {(scene === "lvl1" || scene === "lvl2" || scene === "lvl3") && (
         <div className="absolute top-6 right-6 z-50 flex items-center gap-3">
-          <div className="bg-white rounded-2xl px-4 py-2 shadow-sm border border-orange-100 text-sm font-black text-orange-600">
+          <div className="bg-[#FFF9F2] rounded-2xl px-4 py-2 shadow-sm border border-orange-100 text-sm font-black text-orange-600">
             ✏️ {logs.filter(l => l.isCorrect).length} Benar
           </div>
-          <div className="bg-white rounded-2xl px-4 py-2 shadow-sm border border-red-100 text-sm font-black text-red-400">
+          <div className="bg-[#FFF9F2] rounded-2xl px-4 py-2 shadow-sm border border-red-100 text-sm font-black text-red-400">
             ❌ {mistakes} Salah
           </div>
         </div>
@@ -194,7 +240,7 @@ export default function MotorikBudi() {
       {/* SCENE 1: INTRO */}
       {scene === "intro" && (
         <VNStoryScreen
-          text="Budi ingin pergi ke suatu taman. Tetapi dia kesepian dan ingin kamu menemani dia berpetualang. Bantu Budi menyelesaikan soal-soal ini agar Budi dan kamu sampai di taman!"
+          text="guribu ingin pergi ke suatu taman. Tetapi dia kesepian dan ingin kamu menemani dia berpetualang. Bantu guribu menyelesaikan soal-soal ini agar guribu dan kamu sampai di taman!"
           onNext={() => setScene("lvl1")}
         />
       )}
@@ -212,7 +258,7 @@ export default function MotorikBudi() {
       {/* SCENE 3: TRANSISI 1 */}
       {scene === "trans1" && (
         <VNStoryScreen
-          text="Budi bilang: 'Wah, tulisanmu rapi sekali! Peta ini mulai menunjukkan jalan, ayo lanjut masuk ke hutan!'"
+          text="guribu bilang: 'Wah, tulisanmu rapi sekali! Peta ini mulai menunjukkan jalan, ayo lanjut masuk ke hutan!'"
           onNext={() => setScene("lvl2")}
         />
       )}
@@ -239,7 +285,7 @@ export default function MotorikBudi() {
                 key={idx}
                 draggable
                 onDragStart={() => setDraggedLetter(opt)}
-                className="w-32 h-40 bg-white border-b-8 border-green-600 rounded-3xl flex items-center justify-center text-7xl font-black text-gray-700 cursor-grab active:cursor-grabbing hover:-translate-y-2 transition-transform shadow-lg"
+                className="w-32 h-40 bg-[#FFF9F2] border-b-8 border-green-600 rounded-3xl flex items-center justify-center text-7xl font-black text-gray-700 cursor-grab active:cursor-grabbing hover:-translate-y-2 transition-transform shadow-lg"
               >
                 {opt}
               </div>
@@ -251,7 +297,7 @@ export default function MotorikBudi() {
       {/* SCENE 5: TRANSISI 2 */}
       {scene === "trans2" && (
         <VNStoryScreen
-          text="Budi berseru, 'Jalannya hampir sampai! Kita hanya perlu melewati rintangan kombinasi di bukit ini!'"
+          text="guribu berseru, 'Jalannya hampir sampai! Kita hanya perlu melewati rintangan kombinasi di bukit ini!'"
           onNext={() => setScene("lvl3")}
         />
       )}
@@ -278,7 +324,7 @@ export default function MotorikBudi() {
               </div>
               <div className="flex justify-center gap-6">
                 {LEVEL_3_TASKS[taskIndex].options?.map((opt, idx) => (
-                  <div key={idx} draggable onDragStart={() => setDraggedLetter(opt)} className="w-24 h-32 bg-white border-b-8 border-purple-600 rounded-2xl flex items-center justify-center text-6xl font-black text-gray-700 cursor-grab hover:-translate-y-2 shadow-md">
+                  <div key={idx} draggable onDragStart={() => setDraggedLetter(opt)} className="w-24 h-32 bg-[#FFF9F2] border-b-8 border-purple-600 rounded-2xl flex items-center justify-center text-6xl font-black text-gray-700 cursor-grab hover:-translate-y-2 shadow-md">
                     {opt}
                   </div>
                 ))}
@@ -291,7 +337,7 @@ export default function MotorikBudi() {
       {/* SCENE 7: OUTRO */}
       {scene === "outro" && (
         <VNStoryScreen
-          text="Yeay! Budi sudah sampai di taman! Budi dan kelinci sangat senang. Terima kasih sudah menemani Budi berpetualang!"
+          text="Yeay! guribu sudah sampai di taman! guribu dan kelinci sangat senang. Terima kasih sudah menemani guribu berpetualang!"
           onNext={() => setScene("freedraw")}
         />
       )}
@@ -307,7 +353,7 @@ export default function MotorikBudi() {
 
       {/* SCENE 9: SELESAI */}
       {scene === "done" && (
-        <div className="bg-white p-12 rounded-[40px] shadow-2xl text-center max-w-lg animate-in zoom-in">
+        <div className="bg-[#FFF9F2] p-12 rounded-[40px] shadow-2xl text-center max-w-lg animate-in zoom-in">
           <div className="text-8xl mb-6 animate-bounce">🌟</div>
           <h1 className="text-4xl font-black text-orange-600 mb-2">Petualangan Selesai!</h1>
 

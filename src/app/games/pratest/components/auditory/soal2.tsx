@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { say } from "@/lib/speak";
 
 interface Props {
   onAnswer: (target: string, answered: string, isCorrect: boolean, timeMs: number, category: string, autoAdvance?: boolean) => void;
@@ -14,10 +15,7 @@ export default function AuditorySoal2({ onAnswer }: Props) {
   }, []);
 
   const playAudio = (kata: string) => {
-    const speech = new SpeechSynthesisUtterance(kata);
-    speech.lang = "id-ID";
-    speech.rate = 0.8;
-    window.speechSynthesis.speak(speech);
+    say(kata);
   };
 
   const handleBoxClick = (kata: string) => {
