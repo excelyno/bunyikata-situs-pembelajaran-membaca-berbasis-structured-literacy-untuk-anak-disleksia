@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import DrawingCanvas from "@/app/components/DrawingCanvas";
+import { say } from "@/lib/speak";
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 const NUMBERS = "1234567890".split("");
@@ -21,6 +22,7 @@ export default function MotorikBelajarStepByStep() {
 
   const handleSelectChar = (char: string) => {
     setActiveItem(char);
+    setStep(2); // Langsung pindah ke canvas setelah pilih huruf
   };
 
   // Fungsi ini yang akan dipanggil OLEH DrawingCanvas saat anak klik tombol "Selanjutnya" di dalam canvas
@@ -30,9 +32,7 @@ export default function MotorikBelajarStepByStep() {
   };
 
   const playAudio = (text: string) => {
-    const speech = new SpeechSynthesisUtterance(text);
-    speech.lang = "id-ID";
-    window.speechSynthesis.speak(speech);
+    say(text);
   };
 
   const renderProgress = () => (
@@ -49,9 +49,13 @@ export default function MotorikBelajarStepByStep() {
   );
 
   return (
-    <div className="min-h-screen bg-[#FFFDF9] pt-8 px-6 pb-12 font-sans flex flex-col items-center">
+    <div className="min-h-screen bg-[#FFF8F0] pt-8 px-6 pb-12 font-sans flex flex-col items-center relative overflow-hidden">
       
-      <header className="w-full max-w-3xl flex justify-between items-start mb-4">
+      {/* Dekorasi elemen organik background */}
+      <div className="absolute top-0 right-0 w-72 h-72 bg-[#FDE9D2] rounded-full translate-x-20 -translate-y-20 opacity-60" />
+      <div className="absolute bottom-0 left-0 w-56 h-56 bg-[#EF953322] rounded-full -translate-x-10 translate-y-10" />
+
+      <header className="w-full max-w-3xl flex justify-between items-start mb-4 z-10">
         <button 
           onClick={handlePrevStep}
           className="w-12 h-12 bg-[#FFF6ED] rounded-2xl flex items-center justify-center text-[#D97736] text-xl font-black border-2 border-[#FDE9D2] hover:bg-[#FDE9D2] transition-colors"
@@ -79,7 +83,7 @@ export default function MotorikBelajarStepByStep() {
                   className={`w-14 h-14 text-2xl font-black rounded-2xl transition-all flex items-center justify-center border-b-4 active:border-b-0 active:translate-y-1
                     ${activeItem === char 
                       ? "bg-[#D97736] text-white border-[#B35D26] shadow-sm scale-110" 
-                      : "bg-white text-[#5C4D4A] border-[#FDE9D2] hover:bg-[#FFF6ED] hover:text-[#D97736]"
+                      : "bg-[#FFF9F2] text-[#5C4D4A] border-[#FDE9D2] hover:bg-[#FFF6ED] hover:text-[#D97736]"
                     }`}
                 >
                   {char}
@@ -95,7 +99,7 @@ export default function MotorikBelajarStepByStep() {
                   className={`w-14 h-14 text-2xl font-black rounded-2xl transition-all flex items-center justify-center border-b-4 active:border-b-0 active:translate-y-1
                     ${activeItem === num 
                       ? "bg-[#D97736] text-white border-[#B35D26] shadow-sm scale-110" 
-                      : "bg-white text-[#5C4D4A] border-[#FDE9D2] hover:bg-[#FFF6ED] hover:text-[#D97736]"
+                      : "bg-[#FFF9F2] text-[#5C4D4A] border-[#FDE9D2] hover:bg-[#FFF6ED] hover:text-[#D97736]"
                     }`}
                 >
                   {num}
@@ -104,16 +108,7 @@ export default function MotorikBelajarStepByStep() {
             </div>
           </div>
 
-          {activeItem && (
-            <div className="mt-8 flex justify-center animate-in fade-in zoom-in">
-              <button 
-                onClick={handleNextStep}
-                className="bg-[#4A7C59] text-white px-12 py-4 rounded-full font-black text-xl shadow-[0_6px_0_#2E523A] active:translate-y-2 active:shadow-none hover:bg-[#3B6648] transition-all flex items-center gap-3"
-              >
-                Mulai Menulis {activeItem} <span>→</span>
-              </button>
-            </div>
-          )}
+
         </div>
       )}
 
@@ -149,14 +144,7 @@ export default function MotorikBelajarStepByStep() {
             {score >= 80 ? "Hebat Sekali!" : score >= 50 ? "Bagus, Sedikit Lagi!" : "Ayo Coba Lagi!"}
           </h2>
           
-          <div className="bg-white px-6 py-4 rounded-3xl border-2 border-[#FDE9D2] mb-8 w-full">
-            <p className="text-[#8D7B68] font-bold text-sm mb-1">Skor Kerapian Garismu:</p>
-            <div className="text-5xl font-black text-[#D97736]">{score}</div>
-            <p className="text-[#8D7B68] text-sm mt-2">
-              {score < 80 && "Garismu masih sedikit keluar jalur, yuk kita latih lagi biar rapi!"}
-              {score >= 80 && "Tulisanmu sudah sangat rapi mengikuti pola putus-putus!"}
-            </p>
-          </div>
+
 
           <div className="flex flex-col gap-3 w-full">
             <button 

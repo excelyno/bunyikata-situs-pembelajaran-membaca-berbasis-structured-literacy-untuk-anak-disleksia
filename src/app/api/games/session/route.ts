@@ -14,6 +14,18 @@ export async function POST(req: Request) {
     const decoded = verifyToken(token);
     if (!decoded) return NextResponse.json({ error: "Invalid Token" }, { status: 401 });
 
+    // Hapus sesi PRATEST yang menggantung (IN_PROGRESS) jika ada,
+    // supaya data diagnosa tidak kotor oleh percobaan yang tidak selesai.
+    if (sessionType === "PRATEST") {
+      await prisma.gameSession.deleteMany({
+        where: {
+          studentId: decoded.userId,
+          sessionType: "PRATEST",
+          status: "IN_PROGRESS"
+        }
+      });
+    }
+
     // Buat sesi baru di DB
     const newSession = await prisma.gameSession.create({
       data: {

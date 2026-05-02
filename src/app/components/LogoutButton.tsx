@@ -15,9 +15,9 @@ export default function LogoutButton() {
   return (
     <button 
       onClick={handleLogout}
-      className="mt-auto bg-red-50 text-red-500 px-4 py-2 rounded-xl font-bold hover:bg-red-500 hover:text-white transition-all text-sm"
+      className="w-20 h-20 bg-[#F18230] text-white rounded-[24px] flex flex-col items-center justify-center font-black hover:bg-[#D97026] transition-all shadow-[0_5px_0_#C56521] border-b-2 border-orange-700 active:translate-y-1 active:shadow-none"
     >
-      Keluar 
+      <span className="text-[11px] uppercase tracking-tighter">Keluar</span>
     </button>
   );
 }

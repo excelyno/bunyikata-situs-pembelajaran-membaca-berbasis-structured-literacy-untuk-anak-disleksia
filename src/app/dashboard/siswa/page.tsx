@@ -5,7 +5,7 @@ import ImgMotorik from "./assets/petualang-guribuu.png";
 import ImgAuditori from "./assets/petarung-guribuu-removebg-preview.png";
 import ImgVisual from "./assets/detektif-guribuu-removebg-preview.png";
 import ImgRingan from "./assets/permainan-ringan-guribuu-removebg-preview.png";
-import logo from "./assets/logo-bunyikata.jpeg"
+import logo from "./assets/logo-asli.png"
 import LogoutButton from "@/app/components/LogoutButton";
 
 
@@ -39,10 +39,14 @@ export default function SiswaDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFDF9] font-sans pb-32">
+    <div className="min-h-screen bg-[#FFF8F0] font-sans pb-32 relative overflow-hidden">
       
+      {/* Dekorasi elemen organik background */}
+      <div className="absolute top-0 right-0 w-72 h-72 bg-[#FDE9D2] rounded-full translate-x-20 -translate-y-20 opacity-60" />
+      <div className="absolute bottom-0 left-0 w-56 h-56 bg-[#EF953322] rounded-full -translate-x-10 translate-y-10" />
+
       {/* HEADER */}
-      <header className="p-6 flex justify-between items-center max-w-5xl mx-auto relative h-24">
+      <header className="p-6 flex justify-between items-center max-w-5xl mx-auto relative h-24 z-10">
         {/* Tombol Back */}
         <LogoutButton />
 
@@ -53,12 +57,12 @@ export default function SiswaDashboard() {
   
 
         {/* Logo BK */}
-        <div className="w-14 h-14 bg-[#D97736] rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-md z-10">
+        <div className="w-20 h-20 flex items-center justify-center z-10">
           <img 
-                  src={logo.src} 
-                  alt="Ikon Auditori" 
-                  className="w-full h-full object-contain drop-shadow-md"
-                />
+            src={logo.src} 
+            alt="Logo BunyiKata" 
+            className="w-full h-full object-contain"
+          />
         </div>
         
       </header>

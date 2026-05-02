@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { say } from "@/lib/speak";
 import DrawingCanvas from "@/app/components/DrawingCanvas";
+import HeroImage from "../../../../../../public/hero/gorogu-landing.png";
+
 
 /* =========================================================
    DATA DEFINISI TUGAS — LEVEL 1, 2, 3
@@ -115,13 +117,13 @@ export default function AuditoriBertarung() {
 
   /* --- Auto‑play narasi --- */
   useEffect(() => {
-    if (scene === "intro") say("Sang Singa ingin menjadi seorang raja. Ia harus mengalahkan hewan‑hewan lain. Ayo bantu Singa!");
+    if (scene === "intro") say("Sang Guribuu sedang berpetualang di lautan suara. Ia harus mengalahkan monster‑monster pengganggu. Ayo bantu Guribuu!");
     if (scene === "lvl1") say(`Dengarkan hurufnya!`);
-    if (scene === "trans1") say("Hebat! Level 1 berhasil. Ayo lanjut ke Level 2!");
+    if (scene === "trans1") say("Hebat! Guribuu berhasil mengalahkan monster pertama. Ayo lanjut ke Level 2!");
     if (scene === "lvl2") say(`Dengarkan katanya!`);
-    if (scene === "trans2") say("Luar biasa! Tinggal satu tantangan lagi!");
+    if (scene === "trans2") say("Luar biasa! Guribuu semakin kuat. Tinggal satu tantangan lagi!");
     if (scene === "lvl3") say("Pilih pengucapan yang benar!");
-    if (scene === "outro") say("Singa berhasil menjadi raja! Selamat!");
+    if (scene === "outro") say("Guribuu berhasil menguasai samudra suara! Selamat!");
   }, [scene]);
 
   /* --------------------------------------------------------
@@ -204,20 +206,79 @@ export default function AuditoriBertarung() {
   const finalScore = Math.max(10, 100 - mistakes * 5);
 
   /* =========================================================
-     RENDER
+     COMPONENTS
      ========================================================= */
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-emerald-50 via-green-50 to-lime-50 font-sans relative overflow-hidden">
+  const VNStoryScreen = ({ text, onNext, icon }: { text: string; onNext: () => void; icon?: string }) => (
+    <div className="w-full h-full flex flex-col justify-end relative overflow-hidden min-h-[400px]">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-white/20 rounded-full blur-3xl" />
+      
+      {/* KARAKTER GURIBUU */}
+      <img 
+        src={HeroImage.src} 
+        alt="guribu" 
+        className="absolute bottom-[22%] sm:bottom-28 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-10 w-48 sm:w-64 md:w-80 transition-all duration-700 z-10" 
+      />
 
-      {/* ===== FLASH FEEDBACK OVERLAY ===== */}
+      {/* KOTAK DIALOG (TRANSPARAN) */}
+      <div className="bg-white/40 backdrop-blur-sm border-t-4 border-orange-500/80 p-6 w-full min-h-[22vh] shadow-xl z-20 flex flex-col justify-between">
+        <div className="flex items-start gap-4">
+          <span className="text-4xl">{icon || "🐙"}</span>
+          <p className="text-lg sm:text-xl text-gray-900 font-bold leading-relaxed max-w-4xl drop-shadow-sm">
+            {text}
+          </p>
+        </div>
+        <div className="flex justify-end mt-4">
+          <button 
+            onClick={onNext} 
+            className="bg-[#F18230] text-white px-8 py-3 rounded-full font-black text-lg shadow-[0_6px_0_#C56521] active:translate-y-2 active:shadow-none hover:bg-[#E07220] transition-all flex items-center gap-2"
+          >
+            Lanjut <span>→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-[#FFF8F0] font-sans relative overflow-hidden">
+      
+      {/* Dekorasi elemen organik background */}
+      <div className="absolute top-0 right-0 w-72 h-72 bg-[#FDE9D2] rounded-full translate-x-20 -translate-y-20 opacity-60" />
+      <div className="absolute bottom-0 left-0 w-56 h-56 bg-[#EF953322] rounded-full -translate-x-10 translate-y-10" />
+
+      {/* ===== FEEDBACK POPUP ===== */}
       {flash && (
-        <div className={`fixed inset-0 z-[100] pointer-events-none flex items-center justify-center transition-opacity duration-300 ${flash === "correct" ? "bg-green-400/20" : "bg-red-400/20"}`}>
-          <span className="text-8xl animate-bounce">{flash === "correct" ? "✅" : "❌"}</span>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className={`bg-[#FFF9F2] rounded-[40px] p-8 max-w-sm w-full text-center shadow-2xl border-b-8 ${flash === "correct" ? "border-green-400" : "border-red-400"} animate-in zoom-in duration-300`}>
+            <div className="w-32 h-32 mx-auto mb-4 animate-bounce flex items-center justify-center">
+              {flash === "correct" ? (
+                <span className="text-8xl">🌟</span>
+              ) : (
+                <img src={HeroImage.src} alt="Guribuu" className="w-full h-full object-contain drop-shadow-md" />
+              )}
+            </div>
+            <h3 className={`text-2xl font-black mb-2 ${flash === "correct" ? "text-green-600" : "text-red-500"}`}>
+              {flash === "correct" ? "Hebat!" : "Ayo Coba Lagi!"}
+            </h3>
+            <p className="text-gray-900 font-medium mb-6">
+              {flash === "correct" 
+                ? "Jawabanmu benar! Guribuu bangga padamu!" 
+                : "Wah, belum tepat! Guribuu yakin kamu bisa, dengarkan lagi ya! 🧐"}
+            </p>
+            {flash === "wrong" && (
+              <button 
+                onClick={() => setFlash(null)}
+                className="w-full bg-[#F18230] text-white py-3 rounded-2xl font-black shadow-[0_4px_0_#C56521] active:translate-y-1 active:shadow-none"
+              >
+                Dengar Lagi 💪
+              </button>
+            )}
+          </div>
         </div>
       )}
 
       {/* ===== TOP BAR ===== */}
-      <div className="sticky top-0 z-50 bg-emerald-700 text-white shadow-lg">
+      <div className="sticky top-0 z-50 bg-[#EF9533] text-white shadow-lg">
         <div className="max-w-4xl mx-auto flex items-center justify-between px-4 py-3">
           <button
             onClick={() => router.push("/games/terapi/auditori")}
@@ -226,20 +287,20 @@ export default function AuditoriBertarung() {
             ←
           </button>
           <h1 className="text-lg md:text-xl font-black tracking-wide uppercase">
-            🦁 Terapi Auditori — Bertarung
+            🐙 Petualangan Guribuu — Auditori
           </h1>
           {/* Live score pills */}
           {["lvl1", "lvl2", "lvl3"].includes(scene) ? (
             <div className="flex gap-2">
-              <span className="bg-emerald-500 text-white text-xs font-black px-3 py-1 rounded-full">✓ {correctCount}</span>
-              <span className="bg-red-400 text-white text-xs font-black px-3 py-1 rounded-full">✗ {mistakes}</span>
+              <span className="bg-[#D17A20] text-white text-xs font-black px-3 py-1 rounded-full shadow-inner">✓ {correctCount}</span>
+              <span className="bg-red-500/80 text-white text-xs font-black px-3 py-1 rounded-full shadow-inner">✗ {mistakes}</span>
             </div>
           ) : <div className="w-20" />}
         </div>
         {/* Progress bar */}
         {["lvl1", "lvl2", "lvl3"].includes(scene) && (
-          <div className="h-1.5 bg-emerald-900/30">
-            <div className="h-full bg-yellow-300 transition-all duration-500 ease-out" style={{ width: `${progressPct}%` }} />
+          <div className="h-1.5 bg-orange-900/20">
+            <div className="h-full bg-white transition-all duration-500 ease-out" style={{ width: `${progressPct}%` }} />
           </div>
         )}
       </div>
@@ -249,34 +310,25 @@ export default function AuditoriBertarung() {
 
         {/* ────────── INTRO ────────── */}
         {scene === "intro" && (
-          <div className="bg-white rounded-[32px] shadow-xl p-8 md:p-12 text-center w-full border border-emerald-100 animate-in zoom-in duration-500">
-            <div className="text-7xl mb-4">🦁</div>
-            <h2 className="text-3xl md:text-4xl font-black text-emerald-800 mb-3">Pertarungan Singa</h2>
-            <p className="text-gray-600 font-medium leading-relaxed mb-6 max-w-md mx-auto">
-              Sang Singa ingin menjadi seorang raja. Ia harus mengalahkan hewan‑hewan lain dengan menjawab tantangan suara. Bantu Singa menjadi raja!
-            </p>
-            <div className="flex items-center justify-center gap-4 text-4xl mb-6">
-              <span>🐍</span><span>🦅</span><span>🐊</span><span>🐻</span><span>🐉</span>
-            </div>
-            <button
-              onClick={() => setScene("lvl1")}
-              className="bg-emerald-600 text-white px-10 py-4 rounded-2xl font-black text-lg shadow-[0_6px_0_#065f46] hover:bg-emerald-700 active:translate-y-1 active:shadow-[0_2px_0_#065f46] transition-all"
-            >
-              Mulai Pertarungan! ⚔️
-            </button>
+          <div className="w-full h-full animate-in zoom-in duration-500 z-10">
+            <VNStoryScreen 
+              text="Halo! Aku Guribuu. Aku sedang menjelajahi Samudra Suara, tapi ada banyak monster yang mengganggu. Bantu aku mengalahkan mereka dengan mendengarkan suara dengan teliti ya!"
+              onNext={() => setScene("lvl1")}
+              icon="🐙"
+            />
           </div>
         )}
 
         {/* ────────── LEVEL 1 — Dengarkan Huruf ────────── */}
         {scene === "lvl1" && (
-          <div className="w-full animate-in slide-in-from-right duration-500">
+          <div className="w-full animate-in slide-in-from-right duration-500 z-10">
             {/* Card */}
-            <div className="bg-white rounded-[28px] shadow-xl border border-emerald-100 overflow-hidden">
+            <div className="bg-[#FFF9F2] rounded-[28px] shadow-xl border border-orange-100 overflow-hidden">
               {/* Card header */}
-              <div className="bg-emerald-600 text-white px-6 py-4 flex items-center justify-between">
+              <div className="bg-[#EF9533] text-white px-6 py-4 flex items-center justify-between">
                 <div>
                   <h3 className="font-black text-lg">Level 1 — Dengarkan Huruf</h3>
-                  <p className="text-emerald-100 text-sm font-medium">Soal {taskIdx + 1} dari {LEVEL_1_TASKS.length}</p>
+                  <p className="text-orange-100 text-sm font-medium">Soal {taskIdx + 1} dari {LEVEL_1_TASKS.length}</p>
                 </div>
                 <span className="text-3xl">{currentOpponent.split(" ")[0]}</span>
               </div>
@@ -288,7 +340,7 @@ export default function AuditoriBertarung() {
                 {/* Speaker button */}
                 <button
                   onClick={() => say(LEVEL_1_TASKS[taskIdx].voice)}
-                  className="w-24 h-24 mx-auto bg-emerald-100 hover:bg-emerald-200 rounded-full flex items-center justify-center text-5xl shadow-inner transition-all hover:scale-105 active:scale-95 mb-8"
+                  className="w-24 h-24 mx-auto bg-orange-50 hover:bg-orange-100 rounded-full flex items-center justify-center text-5xl shadow-inner transition-all hover:scale-105 active:scale-95 mb-8 border-2 border-orange-100"
                 >
                   🔊
                 </button>
@@ -299,7 +351,7 @@ export default function AuditoriBertarung() {
                     <button
                       key={opt}
                       onClick={() => handleLvl1(opt)}
-                      className="bg-gray-800 text-white rounded-2xl py-4 text-3xl font-black hover:bg-gray-700 active:scale-95 transition-all shadow-md"
+                      className="bg-[#5C4D4A] text-white rounded-2xl py-4 text-3xl font-black hover:bg-[#433835] active:scale-95 transition-all shadow-md"
                     >
                       {opt}
                     </button>
@@ -312,28 +364,24 @@ export default function AuditoriBertarung() {
 
         {/* ────────── TRANSISI 1 ────────── */}
         {scene === "trans1" && (
-          <div className="bg-white rounded-[32px] shadow-xl p-8 text-center w-full border border-emerald-100 animate-in zoom-in duration-500">
-            <div className="text-7xl mb-4">💪</div>
-            <h2 className="text-3xl font-black text-emerald-700 mb-3">Level 1 Selesai!</h2>
-            <p className="text-gray-600 mb-6">Singa berhasil mengalahkan lawan pertama! Siap untuk tantangan kata?</p>
-            <button
-              onClick={() => setScene("lvl2")}
-              className="bg-emerald-600 text-white px-8 py-3 rounded-2xl font-black text-lg shadow-[0_6px_0_#065f46] hover:bg-emerald-700 active:translate-y-1 active:shadow-[0_2px_0_#065f46] transition-all"
-            >
-              Lanjut ke Level 2 →
-            </button>
+          <div className="w-full h-full animate-in zoom-in duration-500 z-10">
+            <VNStoryScreen 
+              text="Wah, telingamu tajam sekali! Monster Ular itu langsung lari ketakutan. Ayo kita lanjut ke perairan yang lebih dalam!"
+              onNext={() => setScene("lvl2")}
+              icon="🐙"
+            />
           </div>
         )}
 
         {/* ────────── LEVEL 2 — Kata Awalan ────────── */}
         {scene === "lvl2" && (
-          <div className="w-full animate-in slide-in-from-right duration-500">
-            <div className="bg-white rounded-[28px] shadow-xl border border-emerald-100 overflow-hidden">
+          <div className="w-full animate-in slide-in-from-right duration-500 z-10">
+            <div className="bg-[#FFF9F2] rounded-[28px] shadow-xl border border-orange-100 overflow-hidden">
               {/* Card header */}
-              <div className="bg-emerald-600 text-white px-6 py-4 flex items-center justify-between">
+              <div className="bg-[#EF9533] text-white px-6 py-4 flex items-center justify-between">
                 <div>
                   <h3 className="font-black text-lg">Level 2 — Dengarkan Kata</h3>
-                  <p className="text-emerald-100 text-sm font-medium">Soal {taskIdx + 1} dari {LEVEL_2_TASKS.length}</p>
+                  <p className="text-orange-100 text-sm font-medium">Soal {taskIdx + 1} dari {LEVEL_2_TASKS.length}</p>
                 </div>
                 <span className="text-3xl">{currentOpponent.split(" ")[0]}</span>
               </div>
@@ -344,13 +392,13 @@ export default function AuditoriBertarung() {
                 {/* Speaker button */}
                 <button
                   onClick={() => say(LEVEL_2_TASKS[taskIdx].voice)}
-                  className="w-24 h-24 mx-auto bg-emerald-100 hover:bg-emerald-200 rounded-full flex items-center justify-center text-5xl shadow-inner transition-all hover:scale-105 active:scale-95 mb-4"
+                  className="w-24 h-24 mx-auto bg-orange-50 hover:bg-orange-100 rounded-full flex items-center justify-center text-5xl shadow-inner transition-all hover:scale-105 active:scale-95 mb-4 border-2 border-orange-100"
                 >
                   🔊
                 </button>
 
                 {/* Hint: the spoken word */}
-                <p className="text-2xl font-black text-emerald-700 mb-6">{LEVEL_2_TASKS[taskIdx].voice}</p>
+                <p className="text-2xl font-black text-[#5C4D4A] mb-6">{LEVEL_2_TASKS[taskIdx].voice}</p>
 
                 {/* Options */}
                 <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto">
@@ -358,7 +406,7 @@ export default function AuditoriBertarung() {
                     <button
                       key={opt}
                       onClick={() => handleLvl2(opt)}
-                      className="bg-white border-2 border-emerald-200 text-emerald-800 rounded-2xl py-3 text-lg font-black hover:bg-emerald-50 hover:border-emerald-400 active:scale-95 transition-all shadow-sm"
+                      className="bg-white border-2 border-orange-100 text-[#5C4D4A] rounded-2xl py-3 text-lg font-black hover:bg-orange-50 hover:border-orange-300 active:scale-95 transition-all shadow-sm"
                     >
                       {opt}
                     </button>
@@ -371,16 +419,12 @@ export default function AuditoriBertarung() {
 
         {/* ────────── TRANSISI 2 ────────── */}
         {scene === "trans2" && (
-          <div className="bg-white rounded-[32px] shadow-xl p-8 text-center w-full border border-emerald-100 animate-in zoom-in duration-500">
-            <div className="text-7xl mb-4">🔥</div>
-            <h2 className="text-3xl font-black text-emerald-700 mb-3">Level 2 Selesai!</h2>
-            <p className="text-gray-600 mb-6">Luar biasa! Satu tantangan lagi menuju tahta raja!</p>
-            <button
-              onClick={() => setScene("lvl3")}
-              className="bg-emerald-600 text-white px-8 py-3 rounded-2xl font-black text-lg shadow-[0_6px_0_#065f46] hover:bg-emerald-700 active:translate-y-1 active:shadow-[0_2px_0_#065f46] transition-all"
-            >
-              Masuk Level 3 →
-            </button>
+          <div className="w-full h-full animate-in zoom-in duration-500 z-10">
+            <VNStoryScreen 
+              text="Luar biasa! Guribuu bangga padamu. Sekarang kita akan menghadapi Raja Monster di Samudra Dalam. Fokus ya!"
+              onNext={() => setScene("lvl3")}
+              icon="🐙"
+            />
           </div>
         )}
 
@@ -388,13 +432,13 @@ export default function AuditoriBertarung() {
         {scene === "lvl3" && (() => {
           const task = LEVEL_3_TASKS[taskIdx];
           return (
-            <div className="w-full animate-in slide-in-from-right duration-500">
-              <div className="bg-white rounded-[28px] shadow-xl border border-emerald-100 overflow-hidden">
+            <div className="w-full animate-in slide-in-from-right duration-500 z-10">
+              <div className="bg-[#FFF9F2] rounded-[28px] shadow-xl border border-orange-100 overflow-hidden">
                 {/* Card header */}
-                <div className="bg-emerald-600 text-white px-6 py-4 flex items-center justify-between">
+                <div className="bg-[#EF9533] text-white px-6 py-4 flex items-center justify-between">
                   <div>
                     <h3 className="font-black text-lg">Level 3 — Dengarkan & Pilih</h3>
-                    <p className="text-emerald-100 text-sm font-medium">Soal {taskIdx + 1} dari {LEVEL_3_TASKS.length}</p>
+                    <p className="text-orange-100 text-sm font-medium">Soal {taskIdx + 1} dari {LEVEL_3_TASKS.length}</p>
                   </div>
                   <span className="text-3xl">{currentOpponent.split(" ")[0]}</span>
                 </div>
@@ -412,7 +456,7 @@ export default function AuditoriBertarung() {
                           <button
                             key={i}
                             onClick={() => say(ch)}
-                            className="w-12 h-14 bg-gray-800 text-white rounded-xl flex items-center justify-center text-2xl font-black hover:bg-gray-700 active:scale-90 transition-all cursor-pointer"
+                            className="w-12 h-14 bg-[#5C4D4A] text-white rounded-xl flex items-center justify-center text-2xl font-black hover:bg-[#3D2D29] active:scale-90 transition-all cursor-pointer shadow-md"
                             title={`Dengarkan huruf ${ch}`}
                           >
                             {ch}
@@ -432,10 +476,10 @@ export default function AuditoriBertarung() {
                           say(opt);
                           handleLvl3(opt);
                         }}
-                        className="flex flex-col items-center gap-2 bg-emerald-50 border-2 border-emerald-200 rounded-2xl px-6 py-4 hover:bg-emerald-100 hover:border-emerald-400 active:scale-95 transition-all shadow-sm"
+                        className="flex flex-col items-center gap-2 bg-orange-50 border-2 border-orange-100 rounded-2xl px-6 py-4 hover:bg-orange-100 hover:border-orange-300 active:scale-95 transition-all shadow-sm"
                       >
                         <span className="text-3xl">🔊</span>
-                        <span className="text-lg font-black text-emerald-800">{opt}</span>
+                        <span className="text-lg font-black text-[#5C4D4A]">{opt}</span>
                       </button>
                     ))}
                   </div>
@@ -447,15 +491,15 @@ export default function AuditoriBertarung() {
 
         {/* ────────── OUTRO ────────── */}
         {scene === "outro" && (
-          <div className="bg-white rounded-[32px] shadow-2xl p-8 md:p-12 text-center w-full border border-yellow-200 animate-in zoom-in duration-500">
-            <div className="text-8xl mb-4">👑</div>
-            <h2 className="text-3xl md:text-4xl font-black text-yellow-600 mb-2">Singa Menjadi Raja!</h2>
-            <p className="text-gray-600 font-medium mb-6">Hebat! Singa berhasil mengalahkan semua tantangan dan kini menjadi raja hutan!</p>
+          <div className="bg-[#FFF9F2] rounded-[32px] shadow-2xl p-8 md:p-12 text-center w-full border-b-8 border-orange-200 animate-in zoom-in duration-500 z-10">
+            <div className="text-8xl mb-4">👑🐙</div>
+            <h2 className="text-3xl md:text-4xl font-black text-orange-600 mb-2">Pahlawan Samudra!</h2>
+            <p className="text-gray-600 font-medium mb-6">Hebat! Guribuu dan seluruh penghuni samudra berterima kasih padamu. Kamu memang pendengar yang hebat!</p>
 
             {/* Score summary */}
             <div className="grid grid-cols-3 gap-4 mb-8 max-w-sm mx-auto">
-              <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100">
-                <p className="text-3xl font-black text-emerald-700">{finalScore}</p>
+              <div className="bg-orange-50 rounded-2xl p-4 border border-orange-100">
+                <p className="text-3xl font-black text-orange-700">{finalScore}</p>
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mt-1">Skor</p>
               </div>
               <div className="bg-green-50 rounded-2xl p-4 border border-green-100">
@@ -469,14 +513,14 @@ export default function AuditoriBertarung() {
             </div>
 
             <p className="text-gray-500 font-medium mb-6">
-              {mistakes === 0 ? "Sempurna! Tidak ada kesalahan 🎉" : `Kamu membuat ${mistakes} kesalahan. Terus berlatih ya!`}
+              {mistakes === 0 ? "Sempurna! Telingamu sangat peka 🎉" : `Kamu membuat ${mistakes} kesalahan. Terus berlatih ya!`}
             </p>
 
             <button
               onClick={finishGame}
-              className="w-full max-w-sm mx-auto bg-emerald-600 text-white py-4 rounded-2xl font-black text-xl shadow-[0_6px_0_#065f46] hover:bg-emerald-700 active:translate-y-1 active:shadow-[0_2px_0_#065f46] transition-all"
+              className="w-full max-w-sm mx-auto bg-[#F18230] text-white py-4 rounded-2xl font-black text-xl shadow-[0_6px_0_#C56521] hover:bg-[#E07220] active:translate-y-1 active:shadow-none transition-all"
             >
-              Selesai & Simpan Nilai ✨
+              Simpan & Kembali ✨
             </button>
           </div>
         )}
