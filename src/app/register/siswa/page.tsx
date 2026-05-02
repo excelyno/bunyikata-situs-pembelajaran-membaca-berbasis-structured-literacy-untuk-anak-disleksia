@@ -32,7 +32,7 @@ export default function RegisterSiswaPage() {
       if (data.role === "WALI") {
         router.push("/dashboard/wali");
       } else {
-        router.push("/dashboard/siswa");
+        router.push("/games/pratest");
       }
     } else {
       setError(data.error);

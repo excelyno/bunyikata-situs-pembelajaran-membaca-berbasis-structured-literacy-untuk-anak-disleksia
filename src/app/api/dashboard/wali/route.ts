@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 
 export async function GET() {
   try {
-    // 1. Auth & Verify (Sesuai kode abang)
+    // 1. Auth & Verify
     const cookieStore = await cookies();
     const token = cookieStore.get("bunyikata_token")?.value;
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -56,25 +56,91 @@ export async function GET() {
         errorMap[key] = (errorMap[key] || 0) + 1;
       });
 
+      // Total waktu belajar (dalam detik)
+      const totalTimeSec = siswa.gameSessions.reduce((acc, s) => acc + (s.durationSec || 0), 0);
+
+      // Total sesi
+      const totalSessions = siswa.gameSessions.length;
+
+      // Rata-rata skor
+      const avgScore = totalSessions > 0
+        ? Math.round(siswa.gameSessions.reduce((acc, s) => acc + (s.score || 0), 0) / totalSessions)
+        : 0;
+
+      // Rata-rata response time (ms) dari semua logs
+      const allLogs = siswa.gameSessions.flatMap(s => s.logs);
+      const avgResponseMs = allLogs.length > 0
+        ? Math.round(allLogs.reduce((acc, l) => acc + l.responseTimeMs, 0) / allLogs.length)
+        : 0;
+
+      // Data chart: skor per hari (7 hari terakhir)
+      const now = new Date();
+      const dailyData: { date: string; avgScore: number; totalMin: number; sessions: number }[] = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
+        const dayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const dayEnd = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1);
+        
+        const daySessions = siswa.gameSessions.filter(s => {
+          const created = new Date(s.createdAt);
+          return created >= dayStart && created < dayEnd;
+        });
+
+        const dayAvg = daySessions.length > 0
+          ? Math.round(daySessions.reduce((a, s) => a + s.score, 0) / daySessions.length)
+          : 0;
+        const dayMin = Math.round(daySessions.reduce((a, s) => a + (s.durationSec || 0), 0) / 60);
+
+        dailyData.push({ date: dateStr, avgScore: dayAvg, totalMin: dayMin, sessions: daySessions.length });
+      }
+
+      // Fonik accuracy (gabungan auditori + visual yang ada fonik)
+      const fonikAcc = calculateStats("FONIK").accuracy || calculateStats("AUDITORI").accuracy;
+
+      // Menulis accuracy (bisa dari motorik write)
+      const menulisLogs = siswa.gameSessions
+        .filter(s => s.sessionType.includes("MOTORIK"))
+        .flatMap(s => s.logs)
+        .filter(l => l.errorCategory?.includes("WRITE"));
+      const menulisAcc = menulisLogs.length > 0
+        ? Math.round(menulisLogs.filter(l => l.isCorrect).length / menulisLogs.length * 100)
+        : 0;
+
       return {
         id: siswa.id,
         nama: siswa.nama,
         level: siswa.stat?.level || 1,
         xp: siswa.stat?.xp || 0,
+        coins: siswa.stat?.coins || 0,
         stats: {
           visual: calculateStats("VISUAL").accuracy,
           auditori: calculateStats("AUDITORI").accuracy,
           motorik: calculateStats("MOTORIK").accuracy,
+          fonik: fonikAcc,
+          menulis: menulisAcc,
         },
-        blindSpots: Object.entries(errorMap).sort((a, b) => b[1] - a[1]).slice(0, 3),
-        recentSessions: siswa.gameSessions.slice(0, 3)
+        totalTimeSec,
+        totalSessions,
+        avgScore,
+        avgResponseMs,
+        dailyData,
+        blindSpots: Object.entries(errorMap).sort((a, b) => b[1] - a[1]).slice(0, 5),
+        recentSessions: siswa.gameSessions.slice(0, 5).map(s => ({
+          id: s.id,
+          sessionType: s.sessionType,
+          score: s.score,
+          durationSec: s.durationSec,
+          createdAt: s.createdAt.toISOString(),
+        })),
       };
     });
 
     return NextResponse.json({ 
       namaWali: wali.nama,
       totalAnak: daftarAnak.length,
-      dataAnak: dataLengkapSiswa // Ini data yang bakal dipakai Dashboard
+      dataAnak: dataLengkapSiswa
     });
     
   } catch (error) {

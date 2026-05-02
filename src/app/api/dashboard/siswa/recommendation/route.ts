@@ -12,37 +12,51 @@ export async function GET() {
     const decoded = verifyToken(token);
     if (!decoded) return NextResponse.json({ error: "Invalid token" }, { status: 401 });
 
-    // FIX: Kita sesuaikan dengan skema, pakai 'studentId' bukan 'userId'
-    const lastPratest = await prisma.gameSession.findFirst({
+    // 1. Ambil sesi-sesi terakhir yang sudah selesai (Maks 20 sesi)
+    const completedSessions = await prisma.gameSession.findMany({
       where: { 
-        studentId: decoded.userId, // <--- INI YANG BENAR
-        sessionType: "PRATEST", 
+        studentId: decoded.userId,
         status: "COMPLETED" 
       },
       orderBy: { createdAt: "desc" },
+      take: 20,
       include: { logs: true }
     });
 
-    if (!lastPratest || lastPratest.logs.length === 0) {
-      return NextResponse.json({ recommended: "ALL", message: "Belum ada data Pratest" });
+    // 2. Cek apakah sudah pernah PRATEST atau punya aktivitas lain
+    const hasPratest = completedSessions.some(s => s.sessionType === "PRATEST");
+    const needsPratest = !hasPratest && completedSessions.length === 0;
+
+    // 3. Kumpulkan semua logs untuk kalkulasi rekomendasi yang lebih akurat
+    const allLogs = completedSessions.flatMap(s => s.logs);
+
+    if (allLogs.length === 0) {
+      return NextResponse.json({ 
+        recommended: "ALL", 
+        message: "Belum ada data aktivitas",
+        needsPratest 
+      });
     }
 
-    // Hitung akurasi masing-masing kategori
-    const logs = lastPratest.logs;
-    const calcAccuracy = (prefix: string) => {
-      const catLogs = logs.filter(l => l.errorCategory?.startsWith(prefix));
-      if (catLogs.length === 0) return 100; // Kalau ga ada datanya anggap 100% (aman)
+    // 4. Fungsi hitung akurasi dengan keyword mapping (Handle inkonsistensi penamaan kategori)
+    const calcAccuracy = (keywords: string[]) => {
+      const catLogs = allLogs.filter(l => {
+        const cat = (l.errorCategory || "").toUpperCase();
+        return keywords.some(k => cat.includes(k.toUpperCase()));
+      });
+      
+      if (catLogs.length === 0) return 100; // Default aman jika kategori belum dimainkan
       const correct = catLogs.filter(l => l.isCorrect).length;
       return (correct / catLogs.length) * 100;
     };
 
     const scores = {
-      motorik: calcAccuracy("MOTORIK"),
-      visual: calcAccuracy("VISUAL"),
-      auditori: calcAccuracy("AUDITORY"),
+      motorik: calcAccuracy(["MOTORIK", "WRITING", "MENULIS", "TRACE"]),
+      visual: calcAccuracy(["VISUAL", "MEMORI", "SILUET", "ERROR", "LIHAT"]),
+      auditori: calcAccuracy(["AUDITORY", "AUDITORI", "PHONICS", "DENGAR", "HURUF"]),
     };
 
-    // Cari nilai terkecil untuk direkomendasikan
+    // 5. Cari kategori dengan skor terendah
     let lowestCategory = "motorik";
     let lowestScore = scores.motorik;
 
@@ -55,7 +69,16 @@ export async function GET() {
       lowestScore = scores.auditori;
     }
 
-    return NextResponse.json({ recommended: lowestCategory, scores });
+    // Jika semua skor di atas 90%, rekomendasikan secara bergantian atau tetap ALL
+    if (lowestScore > 90) {
+       lowestCategory = "ALL";
+    }
+
+    return NextResponse.json({ 
+      recommended: lowestCategory, 
+      scores,
+      needsPratest 
+    });
   } catch (error) {
     console.error("Error Detail:", error);
     return NextResponse.json({ error: "Internal Error" }, { status: 500 });
