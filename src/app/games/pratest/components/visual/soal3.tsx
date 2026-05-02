@@ -26,7 +26,7 @@ export default function VisualSoal3({ onAnswer }: Props) {
 
     // Kirim data ke DB tanpa memindah ke soal selanjutnya (autoAdvance = false)
     onAnswer(
-      "Grid_Eliminate_Not_b", 
+      "Grid_Eliminate_Action", 
       `clicked_${letter}`, 
       isCorrect, 
       timeMs, 
@@ -34,10 +34,8 @@ export default function VisualSoal3({ onAnswer }: Props) {
       false 
     );
 
-    // Kalau benar (bukan 'b'), hilangkan hurufnya dari layar
-    if (isCorrect) {
-      setGrid(prev => prev.map(item => item.id === id ? { ...item, visible: false } : item));
-    }
+    // Sekarang b maupun non-b semuanya menghilang jika diklik
+    setGrid(prev => prev.map(item => item.id === id ? { ...item, visible: false } : item));
   };
 
   // Cek apakah semua huruf selain 'b' sudah hilang?
@@ -45,7 +43,29 @@ export default function VisualSoal3({ onAnswer }: Props) {
 
   // Tombol untuk lanjut (Secara manual kita tembak onAnswer dengan autoAdvance true)
   const handleLanjut = () => {
-    onAnswer("Grid_Eliminate_Finished", "finished", true, 0, "VISUAL_SCANNING", true);
+    // 1. Ambil semua huruf yang masih tersisa di layar (visible)
+    const remainingItems = grid.filter(item => item.visible);
+    
+    // 2. Kirim status akhir untuk setiap huruf yang tersisa
+    remainingItems.forEach((item, idx) => {
+      // Jika yang tersisa adalah 'b', maka itu BENAR (berhasil disisakan)
+      // Jika yang tersisa adalah huruf lain, maka itu SALAH (gagal dibuang/terlewati)
+      const isCorrectAction = item.letter === 'b';
+      
+      onAnswer(
+        `Final_Check_${item.letter}_${idx}`, 
+        item.letter, 
+        isCorrectAction, 
+        0, 
+        "VISUAL_SCANNING", 
+        false // Jangan pindah soal dulu
+      );
+    });
+
+    // 3. Beri jeda sangat singkat agar fetch terkirim, lalu pindah soal
+    setTimeout(() => {
+      onAnswer("Grid_Eliminate_Done", "next", true, 0, "VISUAL_SCANNING", true);
+    }, 100);
   };
 
   return (
@@ -77,18 +97,18 @@ export default function VisualSoal3({ onAnswer }: Props) {
         ))}
       </div>
 
-      {/* Area Tombol Lanjut / Petunjuk */}
-      <div className="h-16 flex items-center justify-center">
-        {isFinished ? (
-          <button 
-            onClick={handleLanjut}
-            className="bg-[#EF9550] text-white px-10 py-4 rounded-[20px] font-black text-xl hover:bg-[#D17A20] transition-all shadow-[0_6px_0_#CB7A3E] active:translate-y-2 active:shadow-none animate-bounce"
-          >
-            Selesai! Lanjut 🚀
-          </button>
-        ) : (
-          <p className="text-sm font-medium text-[#8D7B68] bg-[#FDE9D2]/50 px-4 py-2 rounded-full">
-            👆 Klik kotak untuk menghapusnya...
+      {/* Tombol Lanjut Selalu Ada */}
+      <div className="flex flex-col items-center justify-center gap-4">
+        <button 
+          onClick={handleLanjut}
+          className="bg-[#EF9550] text-white px-10 py-4 rounded-[20px] font-black text-xl hover:bg-[#D17A20] transition-all shadow-[0_6px_0_#CB7A3E] active:translate-y-2 active:shadow-none"
+        >
+          Selesai! Lanjut 🚀
+        </button>
+        
+        {!isFinished && (
+          <p className="text-sm font-medium text-[#8D7B68] animate-pulse">
+            👆 Klik kotak untuk membuang huruf yang salah
           </p>
         )}
       </div>

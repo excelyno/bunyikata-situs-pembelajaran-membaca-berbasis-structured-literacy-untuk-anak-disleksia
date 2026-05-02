@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 // Import Semua 9 Soal (Ini harus diredesain di file aslinya masing-masing)
@@ -27,25 +27,29 @@ const COLORS = {
 export default function PratestGame() {
   const router = useRouter();
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [currentStep, setCurrentStep] = useState(0); 
-  const [loading, setLoading] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1); 
+  const [loading, setLoading] = useState(true);
+  const [showExitConfirm, setShowExitConfirm] = useState(false); 
 
-  const handleStart = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/games/session", {
-        method: "POST",
-        body: JSON.stringify({ sessionType: "PRATEST" }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setSessionId(data.sessionId);
-        setCurrentStep(1); 
+  useEffect(() => {
+    const startSession = async () => {
+      try {
+        const res = await fetch("/api/games/session", {
+          method: "POST",
+          body: JSON.stringify({ sessionType: "PRATEST" }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setSessionId(data.sessionId);
+        }
+      } catch (e) {
+        console.error("Gagal memulai sesi:", e);
+      } finally {
+        setLoading(false);
       }
-    } catch (e) {} finally {
-      setLoading(false);
-    }
-  };
+    };
+    startSession();
+  }, []);
 
   const handleAnswerLog = async (
     targetItem: string, answeredItem: string, isCorrect: boolean, 
@@ -110,42 +114,12 @@ export default function PratestGame() {
     );
   };
 
-  // --- STATE 0: MULAI PEMANASAN (Layar Start) ---
-  if (currentStep === 0) {
+  // Loading state saat inisialisasi sesi
+  if (loading && !sessionId) {
     return (
-      <div className="min-h-screen bg-[#FFF8EF] flex flex-col items-center justify-center p-6 font-sans">
-        <div className="bg-white p-10 rounded-[40px] shadow-sm border border-[#FDE9D2] flex flex-col md:flex-row gap-10 items-center max-w-4xl w-full relative">
-          
-          <div className="flex-1 text-center md:text-left">
-            <h1 className="text-5xl font-black text-[#5C4033] mb-4 leading-tight">
-              Petualangan<br/>Awal
-            </h1>
-            <p className="text-[#8D7B68] font-medium mb-8 leading-relaxed">
-              Yuk, kita cari tahu cara belajarmu supaya BunyiKata bisa jadi teman belajar terbaik untukmu!
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 mb-10 text-sm font-bold text-[#8D7B68] justify-center md:justify-start">
-              <div className="flex items-center gap-2 bg-[#FFF8EF] px-4 py-2 rounded-full"><span className="text-xl">⏱️</span> ± 10 menit</div>
-              <div className="flex items-center gap-2 bg-[#FFF8EF] px-4 py-2 rounded-full"><span className="text-xl">🧩</span> 9 Misi Seru</div>
-              <div className="flex items-center gap-2 bg-[#FFF8EF] px-4 py-2 rounded-full"><span className="text-xl">❌</span> Tidak Dinilai</div>
-            </div>
-            
-            <button 
-              onClick={handleStart} 
-              disabled={loading}
-              className="bg-[#F18230] text-white px-10 py-4 rounded-2xl font-black text-xl hover:bg-[#E07220] transition-all shadow-[0_6px_0_#C56521] active:translate-y-2 active:shadow-none w-full md:w-auto"
-            >
-              {loading ? "Gasss! 🚀" : "Mulai Petualangan! ➔"}
-            </button>
-          </div>
-
-          <div className="flex-1 flex justify-center relative">
-             <div className="absolute w-64 h-64 bg-[#FDE9D2] rounded-full -z-10 blur-xl opacity-50"></div>
-             <div className="text-[180px] drop-shadow-xl hover:scale-105 transition-transform">👦🏽</div>
-             <div className="absolute top-10 right-10 text-4xl animate-bounce">⭐</div>
-             <div className="absolute bottom-10 left-10 text-4xl animate-pulse">🍃</div>
-          </div>
-        </div>
+      <div className="min-h-screen bg-[#FFF8EF] flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-24 h-24 border-4 border-[#EF9533] border-t-transparent rounded-full animate-spin mb-6"></div>
+        <h2 className="text-2xl font-black text-[#5C4033]">Menyiapkan Petualangan...</h2>
       </div>
     );
   }
@@ -157,12 +131,39 @@ export default function PratestGame() {
       {/* Header dengan Tombol Back (Hanya tampil saat proses game) */}
       <div className="w-full max-w-2xl flex items-center mb-6">
         <button 
-          onClick={() => router.push("/dashboard/siswa")}
+          onClick={() => setShowExitConfirm(true)}
           className="w-12 h-12 bg-white rounded-full flex items-center justify-center font-black text-xl text-[#8D7B68] hover:bg-[#FDE9D2] hover:text-[#F18230] transition-all shadow-sm"
         >
           {"<"}
         </button>
       </div>
+
+      {/* MODAL KONFIRMASI KELUAR */}
+      {showExitConfirm && (
+        <div className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm flex items-center justify-center p-6 animate-in fade-in duration-300">
+          <div className="bg-white p-8 rounded-[32px] shadow-2xl max-w-sm w-full text-center border-b-8 border-gray-100">
+            <div className="text-6xl mb-4">🚪</div>
+            <h3 className="text-2xl font-black text-[#5C4D4A] mb-2">Mau Keluar?</h3>
+            <p className="text-[#8D7B68] font-medium mb-8">
+              Tinggal sedikit lagi lho! Selesaikan misi awal ini supaya Guribuu bisa bantu kamu belajar lebih seru.
+            </p>
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={() => setShowExitConfirm(false)}
+                className="w-full bg-[#EF9533] text-white py-3 rounded-2xl font-black text-lg shadow-[0_4px_0_#C46A14] active:translate-y-1 active:shadow-none"
+              >
+                Lanjutkan Misi
+              </button>
+              <button 
+                onClick={() => router.push("/dashboard/siswa")}
+                className="w-full bg-gray-100 text-[#8D7B68] py-3 rounded-2xl font-black text-lg hover:bg-red-50 hover:text-red-500 transition-colors"
+              >
+                Keluar Saja
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {currentStep <= 9 && <StepIndicator current={currentStep} />}
 

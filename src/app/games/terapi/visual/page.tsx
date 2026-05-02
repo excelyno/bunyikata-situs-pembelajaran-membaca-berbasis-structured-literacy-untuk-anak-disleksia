@@ -18,13 +18,13 @@ export default function VisualMenu() {
       {/* Header */}
       <div className="text-center mb-12 mt-10">
         <div className="w-52 h-52 mx-auto mb-6 flex items-center justify-center hover:scale-105 transition-transform duration-300">
-          <img src="/hero/gorogu-landing.png" alt="Gorogu" className="w-full h-full object-contain drop-shadow-xl" />
+          <img src="/hero/gorogu-landing.png" alt="guribuu" className="w-full h-full object-contain drop-shadow-xl" />
         </div>
         <h1 className="text-4xl md:text-5xl font-black text-[#5C4D4A] mb-4 tracking-wide">
-          Detektif Gorogu
+          Detektif guribuu
         </h1>
         <p className="text-[#8D7B68] font-bold max-w-lg mx-auto text-lg md:text-xl leading-relaxed tracking-wide px-4">
-          Persiapkan matamu dan ikut mencari jejak rahasia bersama Goroguu!
+          Persiapkan matamu dan ikut mencari jejak rahasia bersama guribuuu!
         </p>
       </div>
 
@@ -57,7 +57,7 @@ export default function VisualMenu() {
           </div>
           <h2 className="text-3xl font-black text-[#4A7C59] mb-3 tracking-wide">Mencari Jejak</h2>
           <p className="text-[#8D7B68] font-bold text-lg leading-relaxed tracking-wide mb-8">
-            Bantu Goroguu menemukan barang-barang yang hilang dengan matamu!
+            Bantu guribuuu menemukan barang-barang yang hilang dengan matamu!
           </p>
           <button className="mt-auto bg-[#4A7C59] text-white px-8 py-4 rounded-full font-black text-xl hover:bg-[#3B6648] shadow-[0_6px_0_#2E523A] active:translate-y-2 active:shadow-none transition-all flex items-center gap-3">
             Mulai Petualangan <span>→</span>

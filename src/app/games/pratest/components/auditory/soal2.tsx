@@ -43,15 +43,15 @@ export default function AuditorySoal2({ onAnswer }: Props) {
       
       {/* Tombol Audio Target */}
       <button 
-        onClick={() => playAudio("kacang")} 
+        onClick={() => playAudio("kucing")} 
         className="w-32 h-32 mx-auto bg-[#FFF8F0] text-[#EF9550] rounded-[24px] border-2 border-b-[6px] border-[#FDE9D2] hover:border-[#EF9550] hover:bg-[#FFF4E8] hover:-translate-y-1 active:border-b-2 active:translate-y-1 transition-all flex flex-col items-center justify-center mb-6 group"
       >
         <span className="text-5xl group-hover:scale-110 transition-transform duration-300">🔊</span>
-        <span className="font-bold text-sm text-[#8D7B68] mt-2 group-hover:text-[#EF9550] transition-colors">kacang</span>
+        <span className="font-bold text-sm text-[#8D7B68] mt-2 group-hover:text-[#EF9550] transition-colors">kucing</span>
       </button>
 
       <p className="text-[#8D7B68] font-bold mb-8 text-xl text-center">
-        Pilih <span className="text-[#EF9550] font-black text-2xl mx-1 underline decoration-wavy decoration-[#FDE9D2]">2 kata</span> yang awalan bunyinya sama dengan <span className="text-[#5C4D4A] font-black text-2xl mx-1">kacang</span>!
+        Pilih <span className="text-[#EF9550] font-black text-2xl mx-1 underline decoration-wavy decoration-[#FDE9D2]">2 kata</span> yang awalan bunyinya sama dengan <span className="text-[#5C4D4A] font-black text-2xl mx-1">kucing</span>!
       </p>
       
       {/* Area Pilihan Jawaban */}

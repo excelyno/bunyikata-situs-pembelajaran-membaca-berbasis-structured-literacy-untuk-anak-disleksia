@@ -18,13 +18,13 @@ export default function MotorikMenu() {
       {/* Header */}
       <div className="text-center mb-12 mt-10">
         <div className="w-52 h-52 mx-auto mb-6 flex items-center justify-center hover:scale-105 transition-transform duration-300">
-          <img src="/hero/gorogu-landing.png" alt="Gorogu" className="w-full h-full object-contain drop-shadow-xl" />
+          <img src="/hero/gorogu-landing.png" alt="guribuu" className="w-full h-full object-contain drop-shadow-xl" />
         </div>
         <h1 className="text-4xl md:text-5xl font-black text-[#5C4D4A] mb-4 tracking-wide">
-          Petualangan Gorogu
+          Petualangan guribuu
         </h1>
         <p className="text-[#8D7B68] font-bold max-w-lg mx-auto text-lg md:text-xl leading-relaxed tracking-wide px-4">
-        Persiapkan diri dan ikut berpetualang dengan Goroguu
+        Persiapkan diri dan ikut berpetualang dengan guribuuu
         </p>
       </div>
 
@@ -64,13 +64,6 @@ export default function MotorikMenu() {
           </button>
         </div>
 
-      </div>
-
-      {/* Footer Info */}
-      <div className="mt-16 text-center w-full max-w-2xl bg-[#FFF6ED] px-8 py-5 rounded-3xl border-2 border-[#D97736]/30 shadow-sm">
-        <p className="text-lg text-[#D97736] font-bold flex items-center justify-center gap-4 tracking-wide leading-relaxed">
-          <span className="text-3xl animate-pulse">💡</span> Tangan yang kuat akan membuat tulisanmu lebih indah!
-        </p>
       </div>
     </div>
   );

@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+import HeroImage from "../../../public/hero/gorogu-landing.png";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -103,17 +105,10 @@ export default function LoginPage() {
 
         {/* KOLOM KANAN: Hero Section (Disembunyikan di Mobile) */}
         <div className="hidden lg:flex w-full lg:w-1/2 bg-[#FFF4E8] relative items-center justify-center p-12 overflow-hidden border-l-2 border-gray-50">
-          
-          {/* Ornamen Bintang Khas BunyiKata */}
-          <div className="absolute top-24 right-20 text-[#F9C03C] text-4xl animate-pulse">⭐</div>
-          <div className="absolute bottom-32 left-16 text-[#F9C03C] text-2xl animate-bounce">⭐</div>
-
           {/* Konten Hero */}
           <div className="text-center z-10 flex flex-col items-center">
             {/* Ganti div emoji ini dengan tag <img src="..." /> untuk maskot atau karakter */}
-            <div className="text-[120px] mb-6 drop-shadow-xl hover:scale-110 transition-transform cursor-pointer">
-              🦉
-            </div>
+            <Image src={HeroImage} alt="" className="w-full h-full object-contain drop-shadow-md"/>
             
             <h3 className="text-3xl font-black text-[#5C4033] mb-3">
               Selamat Datang!

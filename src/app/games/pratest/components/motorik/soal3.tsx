@@ -34,9 +34,9 @@ export default function MotorikSoal3({ onAnswer }: Props) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    ctx.lineWidth = 10;
+    ctx.lineWidth = 12;
     ctx.lineCap = "round";
-    ctx.strokeStyle = "#3b82f6"; // Warna biru
+    ctx.strokeStyle = "#F18230"; // Warna brand orange BunyiKata
     
     // Support mouse & touch screen (HP)
     const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
@@ -64,17 +64,29 @@ export default function MotorikSoal3({ onAnswer }: Props) {
     <div className="animate-in fade-in duration-500 w-full flex flex-col items-center">
       <p className="text-[#5C4033] font-bold text-xl md:text-2xl mb-8">Ikuti garisnya untuk menulis huruf di bawah ini!</p>
       
-      <div className="flex justify-center mb-8 relative">
+      <div className="flex justify-center mb-8 relative bg-white rounded-[40px] shadow-sm">
         {/* Helper text di belakang canvas jika mau ditambah */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-          <span className="text-[200px] font-black text-[#F18230] leading-none">b</span>
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <svg viewBox="0 0 200 200" className="w-[220px] h-[220px] text-gray-300">
+            {/* Jalur huruf 'b' putus-putus (dotted/dashed) */}
+            <path 
+              d="M60,20 L60,180 M60,100 C120,100 150,120 150,150 C150,180 120,180 60,180" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="10" 
+              strokeDasharray="15,15" 
+              strokeLinecap="round"
+            />
+            {/* Panah petunjuk arah (opsional tpi bantu banget) */}
+            <path d="M60,25 L55,35 M60,25 L65,35" fill="none" stroke="#F18230" strokeWidth="4" />
+          </svg>
         </div>
 
         <canvas
           ref={canvasRef}
           width={280}
           height={280}
-          className="bg-white border-4 border-dashed border-[#FDE9D2] rounded-[40px] touch-none cursor-crosshair shadow-sm z-10"
+          className="bg-transparent border-4 border-dashed border-[#FDE9D2] rounded-[40px] touch-none cursor-crosshair shadow-sm z-10"
           onMouseDown={startDrawing}
           onMouseUp={stopDrawing}
           onMouseMove={draw}

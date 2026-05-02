@@ -18,13 +18,13 @@ export default function AuditoriMenu() {
       {/* Header */}
       <div className="text-center mb-12 mt-10">
         <div className="w-52 h-52 mx-auto mb-6 flex items-center justify-center hover:scale-105 transition-transform duration-300">
-          <img src="/hero/gorogu-landing.png" alt="Gorogu" className="w-full h-full object-contain drop-shadow-xl" />
+          <img src="/hero/gorogu-landing.png" alt="gorobu" className="w-full h-full object-contain drop-shadow-xl" />
         </div>
         <h1 className="text-4xl md:text-5xl font-black text-[#5C4D4A] mb-4 tracking-wide">
-          Petarung Gorogu
+          Petarung gorobu
         </h1>
         <p className="text-[#8D7B68] font-bold max-w-lg mx-auto text-lg md:text-xl leading-relaxed tracking-wide px-4">
-          Persiapkan telingamu dan ikut bertarung bersama Goroguu!
+          Persiapkan telingamu dan ikut bertarung bersama guribuuu!
         </p>
       </div>
 

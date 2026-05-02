@@ -6,10 +6,13 @@ import ImgAuditori from "./assets/petarung-guribuu-removebg-preview.png";
 import ImgVisual from "./assets/detektif-guribuu-removebg-preview.png";
 import ImgRingan from "./assets/permainan-ringan-guribuu-removebg-preview.png";
 import logo from "./assets/logo-bunyikata.jpeg"
+import LogoutButton from "@/app/components/LogoutButton";
+
 
 export default function SiswaDashboard() {
   const router = useRouter();
   const [recommendation, setRecommendation] = useState<string | null>(null);
+  const [needsPratest, setNeedsPratest] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -20,6 +23,7 @@ export default function SiswaDashboard() {
       })
       .then(data => {
         if (data.recommended) setRecommendation(data.recommended);
+        if (data.needsPratest) setNeedsPratest(true);
       })
       .catch(e => console.error("Gagal memuat rekomendasi:", e))
       .finally(() => setIsLoading(false));
@@ -40,17 +44,13 @@ export default function SiswaDashboard() {
       {/* HEADER */}
       <header className="p-6 flex justify-between items-center max-w-5xl mx-auto relative h-24">
         {/* Tombol Back */}
-        <button 
-          onClick={() => router.push("/")}
-          className="w-14 h-14 bg-white rounded-full shadow-sm border-2 border-[#E2E8F0] flex items-center justify-center text-[#8D7B68] text-2xl font-black hover:bg-gray-50 hover:-translate-x-1 transition-all z-10"
-        >
-          ←
-        </button>
+        <LogoutButton />
 
         {/* Teks Tengah */}
         <h1 className="text-3xl md:text-4xl font-black text-[#5C4D4A] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none">
           Menu Utama
         </h1>
+  
 
         {/* Logo BK */}
         <div className="w-14 h-14 bg-[#D97736] rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-md z-10">
@@ -60,6 +60,7 @@ export default function SiswaDashboard() {
                   className="w-full h-full object-contain drop-shadow-md"
                 />
         </div>
+        
       </header>
 
       {/* MAIN CONTENT */}
@@ -182,9 +183,43 @@ export default function SiswaDashboard() {
               Istirahat sejenak! Ayo main mini-games seru bersama Guribuu dan teman-teman.
             </p>
           </div>
-
         </div>
       </main>
+
+      {/* OVERLAY PRATEST (Mandatory for new users) */}
+      {needsPratest && (
+        <div className="fixed inset-0 z-[100] bg-[#FFFDF9] flex flex-col items-center justify-center p-6 text-center animate-in fade-in zoom-in duration-500">
+          <div className="max-w-md w-full">
+            <div className="w-64 h-64 mx-auto mb-8 relative">
+              <div className="absolute inset-0 bg-[#FDE9D2] rounded-full animate-ping opacity-20"></div>
+              <img 
+                src="/hero/gorogu-landing.png" 
+                alt="Guribuu" 
+                className="w-full h-full object-contain relative z-10"
+              />
+            </div>
+            
+            <h2 className="text-4xl font-black text-[#5C4D4A] mb-4 tracking-wide">
+              Halo, Teman Baru! 👋
+            </h2>
+            <p className="text-[#8D7B68] font-bold text-lg mb-10 leading-relaxed">
+              Sebelum kita mulai berpetualang, yuk ikuti misi awal sebentar biar Guribuu tahu cara belajar yang pas buat kamu!
+            </p>
+            
+            <button 
+              onClick={() => router.push("/games/pratest")}
+              className="bg-[#EF9533] text-white px-12 py-5 rounded-[30px] font-black text-2xl shadow-[0_8px_0_#C46A14] hover:bg-[#D17A20] active:translate-y-2 active:shadow-none transition-all w-full flex items-center justify-center gap-4 group"
+            >
+              Mulai Misi Awal 
+              <span className="group-hover:translate-x-2 transition-transform">➔</span>
+            </button>
+            
+            <p className="mt-8 text-sm text-[#8D7B68] font-medium opacity-60">
+              Hanya butuh waktu sekitar 10 menit kok!
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
